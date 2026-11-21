@@ -711,6 +711,8 @@ def pretrain(name: str, cutoff_day: int, steps: int = 60000, batch: int = 512):
             net.train()
         if step % 10000 == 0 and step > 0 or step == steps:
             torch.save({"state": net.state_dict(), "norm": norm, "step": step, "cutoff": cutoff_day}, f"/data/ckpt/{name}.pt")
+            if step == steps:
+                open(f"/data/ckpt/{name}.done", "w").close()
             vol.commit()
         if step == steps:
             break
@@ -874,15 +876,18 @@ def pipeline(seeds: int = 3, steps: int = 60000):
         log("features start")
         build_features.remote()
     log("features done; launching trees + corpus")
-    trees_call = train_trees.spawn()
-    build_corpus.remote()
-    log("corpus done; launching pretraining x2 and scratch fine-tunes")
-    pre13 = pretrain.spawn("pre_2013", CUTOFF_2013, steps)
-    prefull = pretrain.spawn("pre_full", 10**6, steps)
+    trees_call = None if os.path.exists("/data/results_trees.json") else train_trees.spawn()
+    if not os.path.exists("/data/corpus_anom.npy"):
+        build_corpus.remote()
+    log("corpus done; launching pretraining and scratch fine-tunes")
+    pre13 = None if os.path.exists("/data/ckpt/pre_2013.done") else pretrain.spawn("pre_2013", CUTOFF_2013, steps)
+    prefull = None if os.path.exists("/data/ckpt/pre_full.done") else pretrain.spawn("pre_full", 10**6, steps)
     scratch = [finetune.spawn("scratch", k) for k in range(seeds)]
-    trees_call.get()
+    if trees_call:
+        trees_call.get()
     log("trees done")
-    pre13.get()
+    if pre13:
+        pre13.get()
     log("pre_2013 done; launching its fine-tunes")
     tuned = [finetune.spawn("pre_2013", k) for k in range(seeds)]
     res_scratch = [c.get() for c in scratch]
@@ -904,7 +909,8 @@ def pipeline(seeds: int = 3, steps: int = 60000):
     with open("/data/results_pipeline.json", "w") as fh:
         json.dump(report, fh, indent=1)
     vol.commit()
-    prefull.get()
+    if prefull:
+        prefull.get()
     best = "pre_full" if val_pre >= val_scratch else "scratch"
     realms = [r for r, n in d.realm.value_counts().items() if n >= 300]
     log("realm hold-outs with", best, realms)
@@ -1143,7 +1149,136 @@ def export_serving():
     print("export done", len(rows), "layer MB", round(os.path.getsize("/data/serve/layer.json") / 1e6, 2))
 
 
-web_image = cpu_image.pip_install("fastapi[standard]==0.115.6", "shapely==2.0.6", "requests==2.32.3")
+web_image = cpu_image.pip_install("fastapi[standard]==0.115.6", "shapely==2.0.6", "requests==2.32.3", "rasterio==1.4.3")
+depth_cache = modal.Dict.from_name("reef-depth", create_if_missing=True)
+UA = {"User-Agent": "reef-margin/0.1 (research prototype)"}
+NOAA_DEM = "https://gis.ngdc.noaa.gov/arcgis/rest/services/DEM_mosaics/DEM_global_mosaic/ImageServer"
+DEP_STAC = "https://stac.digitalearthpacific.org/search"
+GBR_ZIP = "https://files.ausseabed.gov.au/survey/Great%20Barrier%20Reef%20Bathymetry%202020%2030m.zip"
+
+
+def depth_stats(arr, res_m, source, citation, on_coral):
+    import numpy as np
+
+    a = np.asarray(arr, dtype="float64")
+    a = a[np.isfinite(a) & (a < 0) & (a > -60)]
+    if a.size < 10:
+        return None
+    return {"source": source, "citation": citation, "res_m": res_m, "on_coral": on_coral, "median": round(float(-np.median(a)), 1), "p10": round(float(-np.percentile(a, 90)), 1), "p90": round(float(-np.percentile(a, 10)), 1), "n": int(a.size)}
+
+
+def window_values(ds, lat, lon, h, pts):
+    import numpy as np
+    from rasterio.warp import transform, transform_bounds
+    from rasterio.windows import from_bounds
+    from rasterio.windows import transform as wtransform
+
+    b = transform_bounds("EPSG:4326", ds.crs, lon - h, lat - h, lon + h, lat + h)
+    win = from_bounds(*b, ds.transform)
+    a = ds.read(1, window=win, boundless=True, fill_value=np.nan).astype("float64")
+    if ds.nodata is not None and np.isfinite(ds.nodata):
+        a[a == ds.nodata] = np.nan
+    if not pts:
+        return a.ravel()
+    xs, ys = transform("EPSG:4326", ds.crs, [p[0] for p in pts], [p[1] for p in pts])
+    inv = ~wtransform(win, ds.transform)
+    out = []
+    for x, y in zip(xs, ys):
+        cpx, rpx = inv * (x, y)
+        r, c = int(rpx), int(cpx)
+        if 0 <= r < a.shape[0] and 0 <= c < a.shape[1]:
+            out.append(a[r, c])
+    return np.array(out)
+
+
+def depth_noaa(lat, lon, pts, h=0.03):
+    import io
+    import json
+
+    import numpy as np
+    import rasterio
+    import requests
+
+    q = {"geometry": json.dumps({"x": lon, "y": lat}), "geometryType": "esriGeometryPoint", "returnCatalogItems": "true", "returnGeometry": "false", "f": "json"}
+    items = requests.get(f"{NOAA_DEM}/identify", params=q, headers=UA, timeout=60).json().get("catalogItems", {}).get("features", [])
+    fine = [f["attributes"] for f in items if (f["attributes"].get("LowPS") or 1) < 0.0002]
+    if not fine:
+        return None
+    q = {"bbox": f"{lon - h},{lat - h},{lon + h},{lat + h}", "bboxSR": 4326, "imageSR": 4326, "size": "600,600", "format": "tiff", "pixelType": "F32", "noData": -99999, "f": "image"}
+    r = requests.get(f"{NOAA_DEM}/exportImage", params=q, headers=UA, timeout=120)
+    r.raise_for_status()
+    with rasterio.open(io.BytesIO(r.content)) as ds:
+        v = window_values(ds, lat, lon, h, pts)
+    v = np.where(v <= -99990, np.nan, v)
+    return depth_stats(v, round(fine[0]["LowPS"] * 111000), "NOAA NCEI survey depth model", f"NOAA NCEI DEM mosaic ({fine[0].get('Name', '')})", bool(pts))
+
+
+def depth_dep(lat, lon, pts, h=0.03):
+    import json
+
+    import numpy as np
+    import rasterio
+    import requests
+
+    body = {"collections": ["dep_s2_sdb"], "intersects": {"type": "Point", "coordinates": [lon, lat]}, "limit": 3}
+    feats = requests.post(DEP_STAC, data=json.dumps(body), headers={**UA, "Content-Type": "application/json"}, timeout=60).json().get("features", [])
+    vals = []
+    with rasterio.Env(GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR"):
+        for f in feats:
+            with rasterio.open(f["assets"]["mean"]["href"]) as ds:
+                vals.append(window_values(ds, lat, lon, h, pts))
+    if not vals:
+        return None
+    return depth_stats(np.concatenate(vals), 10, "Digital Earth Pacific satellite-derived depth", "Pacific Community (SPC), Digital Earth Pacific SDB, CC BY 4.0", bool(pts))
+
+
+def depth_gbr(lat, lon, pts, h=0.03):
+    import glob
+
+    import numpy as np
+    import rasterio
+    from rasterio.warp import transform_bounds
+
+    if not (-29 <= lat <= -10 and 142 <= lon <= 156):
+        return None
+    vals = []
+    for path in sorted(glob.glob("/data/bathy/gbr/*.tif")):
+        with rasterio.open(path) as ds:
+            l, b, r, t = transform_bounds(ds.crs, "EPSG:4326", *ds.bounds)
+            if l <= lon <= r and b <= lat <= t:
+                vals.append(window_values(ds, lat, lon, h, pts))
+    if not vals:
+        return None
+    return depth_stats(np.concatenate(vals), 30, "AusBathyTopo Great Barrier Reef depth model", "Geoscience Australia, Beaman (2017), AusBathyTopo GBR 30 m, CC BY 4.0", bool(pts))
+
+
+def coral_points(lat, lon):
+    import json
+
+    key = f"{round(lat, 3):.3f},{round(lon, 3):.3f}"
+    body = habitat_cache.get(key)
+    if body is None:
+        try:
+            body = build_habitat(round(lat, 3), round(lon, 3))
+            habitat_cache[key] = body
+        except Exception:
+            return []
+    feats = json.loads(body)["features"]
+    return [(f["properties"]["x"], f["properties"]["y"]) for f in feats if f["properties"]["c"] == "Coral/Algae"]
+
+
+def reef_depth(lat, lon):
+    pts = coral_points(lat, lon)
+    for fn in (depth_noaa, depth_dep, depth_gbr):
+        for use in ([pts, []] if pts else [[]]):
+            try:
+                d = fn(lat, lon, use)
+            except Exception as e:
+                print("depth source failed", fn.__name__, lat, lon, repr(e)[:200], flush=True)
+                d = None
+            if d:
+                return d
+    return {"source": None}
 habitat_cache = modal.Dict.from_name("reef-habitat", create_if_missing=True)
 ACA_WFS = "https://allencoralatlas.org/geoserver/wfs"
 ACA_CLASSES = ("Coral/Algae", "Rock", "Rubble", "Seagrass", "Sand", "Microalgal Mats")
@@ -1382,6 +1517,16 @@ class Api:
                 raise HTTPException(404, "Bleaching years are still being computed")
             return Response(open("/data/serve/years.json", "rb").read(), media_type="application/json")
 
+        @api.get("/depth")
+        def depth(lat: float, lon: float):
+            key = f"{round(lat, 3):.3f},{round(lon, 3):.3f}"
+            d = depth_cache.get(key)
+            if d is None:
+                d = reef_depth(round(lat, 3), round(lon, 3))
+                if d.get("source"):
+                    depth_cache[key] = d
+            return d
+
         @api.get("/habitat")
         def habitat(lat: float, lon: float):
             key = f"{round(lat, 3):.3f},{round(lon, 3):.3f}"
@@ -1546,3 +1691,30 @@ def years_all():
     base = counts[SHIFTS.index(0.0)]
     print("bleaching years", RECENT, "at +0:", np.percentile(base, [10, 25, 50, 75, 90]).tolist(), "share <=2:", round(float((base <= 2).mean()), 3), "share >=5:", round(float((base >= 5).mean()), 3))
     print("at +1:", np.percentile(counts[SHIFTS.index(1.0)], [25, 50, 75]).tolist(), "with -0.5:", np.percentile(counts[SHIFTS.index(-0.5)], [25, 50, 75]).tolist())
+
+
+@app.function(image=web_image, volumes={"/data": vol}, timeout=3 * 3600, cpu=2, memory=4096)
+def fetch_gbr_bathy():
+    import os
+    import shutil
+    import zipfile
+
+    import requests
+
+    os.makedirs("/data/bathy/gbr", exist_ok=True)
+    tmp = "/data/bathy/gbr.zip"
+    with requests.get(GBR_ZIP, headers=UA, stream=True, timeout=120) as r, open(tmp, "wb") as fh:
+        r.raise_for_status()
+        shutil.copyfileobj(r.raw, fh, 16 * 2**20)
+    print("downloaded", os.path.getsize(tmp) // 2**20, "MB", flush=True)
+    with zipfile.ZipFile(tmp) as z:
+        names = z.namelist()
+        print(names[:40], flush=True)
+        for n in names:
+            if n.lower().endswith((".tif", ".tiff", ".tfw", ".xml", ".txt", ".pdf")):
+                target = os.path.join("/data/bathy/gbr", os.path.basename(n))
+                with z.open(n) as src, open(target, "wb") as dst:
+                    shutil.copyfileobj(src, dst)
+    os.remove(tmp)
+    vol.commit()
+    print(sorted(os.listdir("/data/bathy/gbr")), flush=True)

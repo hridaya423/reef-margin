@@ -51,6 +51,7 @@ const groundY = (x: number, z: number) => 0.07 * Math.sin(x * 1.3 + 0.4) * Math.
 
 const CAUSTIC = `
 uniform float uTime;
+uniform float uCaustic;
 varying vec3 vWorldPos;
 varying vec3 vWorldN;
 float caustic(vec2 p, float t) {
@@ -63,11 +64,12 @@ float caustic(vec2 p, float t) {
   return c / 3.0;
 }`;
 
-type Patch = { time: { value: number }; bleach?: { value: number }; living?: { value: THREE.Color } };
+type Patch = { time: { value: number }; caustic: { value: number }; bleach?: { value: number }; living?: { value: THREE.Color } };
 
 function patch(mat: THREE.MeshStandardMaterial, u: Patch) {
   mat.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = u.time;
+    shader.uniforms.uCaustic = u.caustic;
     if (u.bleach) shader.uniforms.uBleach = u.bleach;
     if (u.living) shader.uniforms.uLiving = u.living;
     shader.vertexShader = shader.vertexShader
@@ -99,7 +101,7 @@ function patch(mat: THREE.MeshStandardMaterial, u: Patch) {
     frag = frag.replace(
       "#include <dithering_fragment>",
       `float up2 = clamp(vWorldN.y, 0.0, 1.0);
-      gl_FragColor.rgb *= 1.0 + 0.3 * caustic(vWorldPos.xz, uTime) * up2;
+      gl_FragColor.rgb *= 1.0 + uCaustic * caustic(vWorldPos.xz, uTime) * up2;
       #include <dithering_fragment>`,
     );
     shader.fragmentShader = frag;
@@ -109,10 +111,12 @@ function patch(mat: THREE.MeshStandardMaterial, u: Patch) {
 
 type Colony = { obj: THREE.Object3D; bleach: { value: number }; threshold: number };
 
-export function ReefScene({ seed, mix, taxa, risk, label }: { seed: number; mix: Mix; taxa: Taxon[]; risk: number; label: string }) {
+export function ReefScene({ seed, mix, taxa, risk, depth, label }: { seed: number; mix: Mix; taxa: Taxon[]; risk: number; depth: number | null; label: string }) {
   const host = useRef<HTMLDivElement>(null);
   const riskRef = useRef(risk);
   riskRef.current = risk;
+  const depthRef = useRef(depth);
+  depthRef.current = depth;
 
   useEffect(() => {
     const el = host.current!;
@@ -129,8 +133,12 @@ export function ReefScene({ seed, mix, taxa, risk, label }: { seed: number; mix:
     scene.fog = new THREE.FogExp2(0x5d9fb1, 0.085);
     const camera = new THREE.PerspectiveCamera(34, 1, 0.05, 80);
     camera.position.set(0, 2.4, 6.4);
-    scene.add(new THREE.HemisphereLight(0xd6f3f7, 0x40625a, 1.5));
+    const hemi = new THREE.HemisphereLight(0xd6f3f7, 0x40625a, 1.5);
+    scene.add(hemi);
     const sun = new THREE.DirectionalLight(0xfff4dc, 2.6);
+    const shallowFog = new THREE.Color(0x5d9fb1), deepFog = new THREE.Color(0x1d5875);
+    const caustics = { value: 0.3 };
+    let deep = -1;
     sun.position.set(1.5, 6, 2);
     scene.add(sun);
 
@@ -142,7 +150,7 @@ export function ReefScene({ seed, mix, taxa, risk, label }: { seed: number; mix:
     for (let k = 0; k < gp.count; k++) gp.setY(k, groundY(gp.getX(k), gp.getZ(k)));
     ground.computeVertexNormals();
     const sandColor = new THREE.Color(0xd8ccb0).lerp(new THREE.Color(0x9c9784), Math.min(0.6, mix.rock + mix.rubble * 0.6));
-    scene.add(new THREE.Mesh(ground, patch(new THREE.MeshStandardMaterial({ color: sandColor, roughness: 1 }), { time })));
+    scene.add(new THREE.Mesh(ground, patch(new THREE.MeshStandardMaterial({ color: sandColor, roughness: 1 }), { time, caustic: caustics })));
 
     const place = (r: number) => {
       const a = rand() * Math.PI * 2;
@@ -159,7 +167,7 @@ export function ReefScene({ seed, mix, taxa, risk, label }: { seed: number; mix:
     }
     rockGeo.computeVertexNormals();
     const nRock = Math.round(4 + mix.rock * 30);
-    const rocks = new THREE.InstancedMesh(rockGeo, patch(new THREE.MeshStandardMaterial({ color: 0x7a7c68, roughness: 1 }), { time }), nRock);
+    const rocks = new THREE.InstancedMesh(rockGeo, patch(new THREE.MeshStandardMaterial({ color: 0x7a7c68, roughness: 1 }), { time, caustic: caustics }), nRock);
     const m4 = new THREE.Matrix4();
     for (let k = 0; k < nRock; k++) {
       const [x, z] = place(5.5);
@@ -170,7 +178,7 @@ export function ReefScene({ seed, mix, taxa, risk, label }: { seed: number; mix:
     scene.add(rocks);
 
     const nRubble = Math.round(60 + mix.rubble * 900);
-    const rubble = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 0), patch(new THREE.MeshStandardMaterial({ color: 0xcfc4ad, roughness: 1, flatShading: true }), { time }), nRubble);
+    const rubble = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 0), patch(new THREE.MeshStandardMaterial({ color: 0xcfc4ad, roughness: 1, flatShading: true }), { time, caustic: caustics }), nRubble);
     for (let k = 0; k < nRubble; k++) {
       const [x, z] = place(5);
       const s = 0.025 + rand() * 0.05;
@@ -246,7 +254,7 @@ export function ReefScene({ seed, mix, taxa, risk, label }: { seed: number; mix:
           const mat = (mesh.material as THREE.MeshStandardMaterial).clone();
           mat.roughness = 0.85;
           mat.metalness = 0;
-          mesh.material = patch(mat, { time, bleach, living });
+          mesh.material = patch(mat, { time, caustic: caustics, bleach, living });
         });
         const box = new THREE.Box3().setFromObject(obj);
         const size = box.getSize(new THREE.Vector3());
@@ -287,6 +295,17 @@ export function ReefScene({ seed, mix, taxa, risk, label }: { seed: number; mix:
     renderer.setAnimationLoop(() => {
       const dt = Math.min(clock.getDelta(), 0.05);
       if (!reduce) time.value += dt;
+      const dm = depthRef.current ?? 6;
+      if (dm !== deep) {
+        deep = dm;
+        const k = Math.min(1, Math.max(0, (dm - 2) / 18));
+        (scene.fog as THREE.FogExp2).color.copy(shallowFog).lerp(deepFog, k);
+        (scene.fog as THREE.FogExp2).density = 0.075 + 0.05 * k;
+        sun.intensity = 2.8 - 1.5 * k;
+        hemi.intensity = 1.6 - 0.6 * k;
+        caustics.value = 0.34 - 0.26 * k;
+        el.style.setProperty("--depth", String(k));
+      }
       const r = riskRef.current;
       for (const c of colonies) {
         const target = THREE.MathUtils.smoothstep(r, c.threshold - 0.07, c.threshold + 0.07);

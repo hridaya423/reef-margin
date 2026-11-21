@@ -102,3 +102,7 @@ export async function getYears(signal?: AbortSignal): Promise<Years> {
   const bytes = (b64: string) => Uint8Array.from(atob(b64), (ch) => ch.charCodeAt(0));
   return { ...raw, ann: bytes(raw.ann), counts: bytes(raw.counts) };
 }
+
+export type Depth = { source: string | null; citation?: string; res_m?: number; on_coral?: boolean; median?: number; p10?: number; p90?: number; n?: number };
+
+export const getDepth = (lat: number, lon: number, signal?: AbortSignal) => call<Depth>(`/depth?lat=${lat}&lon=${lon}`, { signal });

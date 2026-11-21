@@ -103,3 +103,15 @@ Held-out realms (>=10%, vs NOAA 90-day max): Central Indo-Pacific 0.848 vs 0.778
 Transformer from scratch: 0.69-0.73, loses to NOAA. Pretrained runs pending.
 
 Outlier persistence (sites with DHW>=4 in both periods): 24 sites, rho 0.31 (p 0.14), within-ecoregion -0.32 (p 0.13). Inconclusive; do not claim persistence or non-persistence.
+
+## Persuasion pass 16:30
+- Home panel: world strip (share of reefs past 50% risk each year; 77% in 2024, about 11% a year in 1988 to 1997), "Best places to restore" ranking, Spermonde added first to "Try a reef".
+- Local pressure and connectivity: WCS local-reef-pressures (Andrello et al. 2022, MIT, 54,596 pixels at 5 km) joined to our cells by nearest pixel (80% matched). File `web/public/data/pressure.json`, raw data in `data/pressures/`. Fields are percentiles; `pressure` is the cumulative score ranked to a percentile; `connect` ranks the 50 Reefs connectivity score; `refuge` is the 50 Reefs BCU flag.
+- Ranking: savable reefs only, score = (100 - pressure) + connect, one per country in the home list. Reef panel "Will it recover?" shows pressure band, main pressure, larvae band, best action.
+- Spermonde (cell 6426): holds today (0 of 10), 7 of 10 at +0.5 C, pressure 86th percentile (nitrogen 97). "Real scan" toggle embeds the SuperSplat Gaussian splat (id 392787d3) of a Mars-restored reef in Indonesia, credited. Exact site not confirmed as the same cell.
+- About dialog: "Will it recover?" and "Limits and safeguards".
+- Verified with headless screenshots: home, list, Spermonde model and scan views.
+
+## Pipeline incident 16:20
+- The pipeline call restarted itself at 16:16 and relaunched pretraining from step 0. Both pretrains had finished (checkpoints at step 60000, backed up to `ckpt_saved/`).
+- Stopped the app, made `pipeline` skip finished stages (`ckpt/<name>.done`, existing trees and corpus), redeployed, relaunched as fc-01M7ZESW0NE4RS6D7KJD29ESQY. GBR depth download relaunched as fc-01M7ZESWATFD203KAAZMJQ12GH (curl was missing; now uses requests).
