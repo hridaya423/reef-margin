@@ -138,3 +138,12 @@ Outlier persistence (sites with DHW>=4 in both periods): 24 sites, rho 0.31 (p 0
 - Name spelled Coralytics everywhere (brand files renamed). Mark gradient is ocean blue #1666a8 to pale #b9daf0 (option A).
 - Search results with repeated region names show coordinates.
 - Scan check (local headless Chrome, `scratchpad/shoot_local.py`, 52 s for all shots): Heron, Mayotte, Whitsundays, Belize, Galapagos look right. Maui dropped: its Sketchfab mesh is mostly a stretched base skirt with the reef on one edge. 17 scans remain. USVI is a single coral mound, framed close.
+
+## Judging push 19:10
+- Heat tolerance needed: `gainNeeded` per reef (0 to warming+1.5 °C in 0.25 steps). Reef panel shows it as a breeding target. Home panel "How much tougher must coral be?" bar chart: share of scoped reefs that hold at each gain (world today: 29% at 0, 74% at +0.25, 90% at +0.5, 97% at +0.75, 99% at +1). Clicking a bar sets the gain used for verdicts, ranking and CSV (`heat_tolerance_needed_C` column).
+- Evidence: Humanes et al. 2024 Nature Communications, one generation of selection adds about 1 °C-week; so +0.5 °C is several generations. Warming 0.27 °C/decade (Forster et al. 2025, IGCC 2024) puts +0.5 °C around 2040; switch label says so.
+- Live: https://coralytics.pages.dev (Cloudflare Pages project `coralytics`, deploy with `npx wrangler pages deploy dist --project-name coralytics --branch main` from `web/`; scans included, each under 25 MiB). QR code: `design/coralytics-qr.png`.
+- Repo public (user approved 21 Nov: "Yes, both"): github.com/hridaya423/reef-margin, MIT LICENSE, README with banner (`.github/assets/`), description, homepage and topics set. Repo name unchanged.
+- Pitch day: open the site 5 minutes before presenting so the Modal API container is warm (scaledown_window 1200 s).
+- People layer: delegated (GHS-POP 2020 within 50 km per reef, `tools/people.py`, `web/public/data/people.json`). Pending.
+- People layer done (subagent, verified against brute force on 33 reefs): `tools/people.py`, GHS-POP R2023A 2020 30 arcsec (doi:10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE, CC BY 4.0). Median 60,300 per reef; 369.4M people within 50 km of any scored reef (deduplicated). Near reefs savable with +0.5 °C coral today: 294.6M; near reefs too hot today: 100.9M; with +0.5 °C warming, near too-hot reefs: 323.5M. Shown under each reef's name, in About, and in the CSV. Caveat from the subagent: about 5% of reefs have slightly non-monotone counts across shifts (dips of at most 3).

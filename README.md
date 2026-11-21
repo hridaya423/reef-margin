@@ -28,6 +28,7 @@ Coral restoration projects pick sites by logistics and recent damage, not by fut
 | How much tougher must coral be? | Heat tolerance needed, in °C, per reef. A target for breeding programs. | The same model, rerun with the reef in cooler water |
 | Will a restored reef last? | Local pressure and larvae supply, ranked into "Best places to restore" | WCS local reef pressures (Andrello et al. 2022), 50 Reefs connectivity |
 | What does this mean for the reef? | A real 3D scan of the nearest surveyed reef, bleaching and dying year by year | Open reef scans, CC BY 4.0 |
+| Who lives nearby? | People within 50 km of each reef | GHS-POP 2020, JRC |
 | What about future warming? | A switch adds 0.5 °C, about 2040 at today's rate of warming | Forster et al. 2025 |
 
 ## Evidence
@@ -87,6 +88,7 @@ The pipeline needs a Modal account. A full run takes several hours of cloud comp
 | WCS local reef pressures (Andrello et al. 2022) | Local pressure ranking | MIT |
 | Boström-Einarsson et al. 2020, Dryad | Restoration project sites | CC0 |
 | Allen Coral Atlas | Habitat maps | CC BY 4.0 |
+| GHS-POP R2023A, epoch 2020 (Schiavina et al. 2023, JRC) | People within 50 km of each reef | CC BY 4.0 |
 | Soneva and Wildflow, Galapagos_3D, Sketchfab contributors | 3D reef scans | CC BY 4.0, credited in the app |
 | Smithsonian 3D | Coral models in the satellite view | CC0 |
 

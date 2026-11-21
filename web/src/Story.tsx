@@ -37,7 +37,10 @@ const EXAMPLES: Example[] = [
 ];
 
 type Pressure = Record<"fishing" | "coastal" | "industry" | "tourism" | "sediment" | "nitrogen" | "pressure" | "connect" | "refuge", number[]>;
-type Data = { reefs: Reef[]; years: Years; pressure: Pressure; projects: Project[] };
+type People = { radius_km: number; pop: number[] };
+type Data = { reefs: Reef[]; years: Years; pressure: Pressure; projects: Project[]; people: People };
+
+const peopleText = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)} million` : n.toLocaleString("en-GB"));
 const NO_PROJECTS: Project[] = [];
 
 const PRESSURES: { k: keyof Pressure; label: string }[] = [
@@ -116,8 +119,8 @@ export function Story() {
   useEffect(() => {
     const ctl = new AbortController();
     setFailed(null);
-    Promise.all([getLayer(ctl.signal), getYears(ctl.signal), getStatic<Pressure>("pressure.json", ctl.signal), getStatic<Project[]>("projects.json", ctl.signal)])
-      .then(([layer, years, pressure, projects]) => setData({ reefs: layer.reefs, years, pressure, projects }))
+    Promise.all([getLayer(ctl.signal), getYears(ctl.signal), getStatic<Pressure>("pressure.json", ctl.signal), getStatic<Project[]>("projects.json", ctl.signal), getStatic<People>("people.json", ctl.signal)])
+      .then(([layer, years, pressure, projects, people]) => setData({ reefs: layer.reefs, years, pressure, projects, people }))
       .catch((e: Error) => !ctl.signal.aborted && setFailed(e.message));
     return () => ctl.abort();
   }, [attempt]);
@@ -214,9 +217,9 @@ export function Story() {
     const pr = data.pressure;
     const rows = scoped.map((i, k) => {
       const x = data.reefs[i];
-      return [k + 1, reefName(x).name, x.country, x.lat, x.lon, bleachYears(data.years, i, shift), bleachYears(data.years, i, shift + 0.5), gainNeeded(data.years, i, shift) ?? "", pr.pressure[i], mainPressure(pr, i).label, pr.connect[i]];
+      return [k + 1, reefName(x).name, x.country, x.lat, x.lon, bleachYears(data.years, i, shift), bleachYears(data.years, i, shift + 0.5), gainNeeded(data.years, i, shift) ?? "", data.people.pop[i], pr.pressure[i], mainPressure(pr, i).label, pr.connect[i]];
     });
-    const head = ["rank", "reef", "country", "lat", "lon", "bleaching_years_last_10", "bleaching_years_plus_0_5C", "heat_tolerance_needed_C", "local_pressure_percentile", "main_pressure", "larvae_supply_percentile"];
+    const head = ["rank", "reef", "country", "lat", "lon", "bleaching_years_last_10", "bleaching_years_plus_0_5C", "heat_tolerance_needed_C", "people_within_50km", "local_pressure_percentile", "main_pressure", "larvae_supply_percentile"];
     const csv = [head, ...rows].map((r) => r.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(",")).join("\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
@@ -398,7 +401,7 @@ export function Story() {
           )}
 
           {data && r && y && (
-            <ReefPanel history={history!} pressure={data.pressure} rank={ranking.rank.get(r.i)} ranked={ranking.order.length} example={example} depth={depth?.i === r.i ? depth.d : undefined} mix={habitat?.i === r.i ? habitat.mix : undefined} r={r} y={y} verdict={verdicts[r.i]} gain={gain} shift={shift} year={year} setYear={(k) => { setPlaying(false); setT(k); }} playing={playing} play={play} warm={warm} setWarm={setWarm} back={() => choose(null)} />
+            <ReefPanel history={history!} people={data.people.pop[r.i]} pressure={data.pressure} rank={ranking.rank.get(r.i)} ranked={ranking.order.length} example={example} depth={depth?.i === r.i ? depth.d : undefined} mix={habitat?.i === r.i ? habitat.mix : undefined} r={r} y={y} verdict={verdicts[r.i]} gain={gain} shift={shift} year={year} setYear={(k) => { setPlaying(false); setT(k); }} playing={playing} play={play} warm={warm} setWarm={setWarm} back={() => choose(null)} />
           )}
         </aside>
       </main>
@@ -427,10 +430,12 @@ export function Story() {
             <dd>The world is warming about 0.27 °C a decade (Forster et al. 2025, Indicators of Global Climate Change). At that rate, 0.5 °C more arrives around 2040. Tropical seas warm a little more slowly, so this is an early estimate.</dd>
             <dt>Restoration projects</dt>
             <dd>The 304 projects in Boström-Einarsson et al. (2020, PLoS ONE, data on Dryad). 224 sit within 25 km of a reef we score. The review records why each site was chosen: an existing restoration site, a disturbance, logistics or "favourable conditions". None names heat or bleaching. With 0.5 °C more warming, 66% of these projects would sit on reefs too hot for today's coral.</dd>
+            <dt>People nearby</dt>
+            <dd>People living within 50 km of each reef, from the JRC's GHS-POP 2020 grid at about 1 km (Schiavina et al. 2023, CC BY 4.0). Counted once each, 369 million people live within 50 km of a reef we score.</dd>
             <dt>Will it recover?</dt>
             <dd>Local pressure comes from WCS's global map of six human pressures on reefs (Andrello et al. 2022): fishing, nitrogen and sediment runoff, coastal population, tourism, and ports. Connection to other reefs, which brings in coral larvae, comes from the 50 Reefs analysis (Beyer et al. 2018). Neither changes the bleaching model. They rank where restoration is most likely to last.</dd>
             <dt>Limits and safeguards</dt>
-            <dd>Surveys are densest in Australia, the Caribbean and Southeast Asia, so the model is least sure elsewhere. It shows where heat makes restoration hard. It does not decide for the people who depend on a reef. A reef marked too hot still needs protection, and the call stays with local communities. Heat-tolerant coral from breeding or assisted gene flow can cut genetic diversity, so sourcing stays local and is monitored. Code and data are open so anyone can check the numbers.</dd>
+            <dd>Surveys are densest in Australia, the Caribbean and Southeast Asia, so the model is least sure elsewhere. It shows where heat makes restoration hard. It does not decide for the people who depend on a reef. A reef marked too hot still needs protection, and the call stays with local communities. Heat-tolerant coral from breeding or assisted gene flow can cut genetic diversity, so sourcing stays local and is monitored. Tougher coral buys time. It does not replace cutting emissions. Code and data are open so anyone can check the numbers.</dd>
             <dt>Open source</dt>
             <dd>Coralytics is an open, community-led tool. The model, the data joins and this map are public, built only on open data. Restoration teams and divers can add their own surveys, which retrain the model and make it surer where it is weakest today.</dd>
             <dt>The reef you see</dt>
@@ -474,7 +479,7 @@ function Warm({ warm, setWarm }: { warm: boolean; setWarm: (v: boolean) => void 
   );
 }
 
-function ReefPanel(p: { history: ReefYear[]; pressure: Pressure; rank: number | undefined; ranked: number; example: Example | undefined; depth: Depth | undefined; mix: Mix | null | undefined; r: Reef; y: Years; verdict: Triage; gain: number; shift: number; year: number; setYear: (k: number) => void; playing: boolean; play: () => void; warm: boolean; setWarm: (v: boolean) => void; back: () => void }) {
+function ReefPanel(p: { history: ReefYear[]; people: number; pressure: Pressure; rank: number | undefined; ranked: number; example: Example | undefined; depth: Depth | undefined; mix: Mix | null | undefined; r: Reef; y: Years; verdict: Triage; gain: number; shift: number; year: number; setYear: (k: number) => void; playing: boolean; play: () => void; warm: boolean; setWarm: (v: boolean) => void; back: () => void }) {
   const { r, y } = p;
   const name = reefName(r);
   const now = bleachYears(y, r.i, p.shift);
@@ -489,6 +494,7 @@ function ReefPanel(p: { history: ReefYear[]; pressure: Pressure; rank: number | 
       </button>
       <h1>{name.name}</h1>
       <p className="place">{name.place}</p>
+      <p className="place">{p.people > 0 ? `${peopleText(p.people)} people live within 50 km` : "No one lives within 50 km"}</p>
 
       <div className="verdict" style={{ ["--v" as string]: VERDICT_COLOR[p.verdict] }}>
         <div className="verdict-title"><span className="dot" />{v.title}</div>
