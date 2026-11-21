@@ -5,3 +5,6 @@ node_modules/
 dist/
 .env
 .env.local
+web/public/scans/
+data/scans/
+data/mermaid/

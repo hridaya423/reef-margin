@@ -1,3 +1,4 @@
+import { Mark } from "./Mark";
 import NumberFlow from "@number-flow/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getHabitat, getLayer, getReef, getYears, postImpact, type Habitat, type ImpactResult, type Layer, type Reef, type ReefDetail, type Years } from "./api";
@@ -325,11 +326,8 @@ export function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true">
-            <path d="M3 21c4-6 8-6 11-2s7 4 15-3" stroke={C.mid} strokeWidth="3" fill="none" strokeLinecap="round" />
-            <path d="M3 27h26" stroke={C.ink} strokeWidth="2" strokeLinecap="round" opacity="0.5" />
-          </svg>
-          Reef Margin
+          <Mark size={24} />
+          Coralitics
         </div>
         <nav className="tabs" role="tablist" aria-label="Views">
           {TABS.map((t) => (

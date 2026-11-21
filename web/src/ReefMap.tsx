@@ -5,9 +5,10 @@ import type { Reef } from "./api";
 const STYLE = "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json";
 export const VERDICT_COLOR = { holds: "#1e8e4a", savable: "#c27a00", beyond: "#d93636" } as const;
 
-type Props = { reefs: Reef[]; verdicts: string[]; selected: number | null; compact: boolean; onPick: (i: number) => void };
+export type Project = [lat: number, lon: number, cell: number, place: string];
+type Props = { reefs: Reef[]; verdicts: string[]; projects: Project[]; selected: number | null; compact: boolean; onPick: (i: number) => void };
 
-export function ReefMap({ reefs, verdicts, selected, compact, onPick }: Props) {
+export function ReefMap({ reefs, verdicts, projects, selected, compact, onPick }: Props) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<MLMap | null>(null);
   const [ready, setReady] = useState(false);
@@ -26,6 +27,19 @@ export function ReefMap({ reefs, verdicts, selected, compact, onPick }: Props) {
           "circle-radius": ["interpolate", ["linear"], ["zoom"], 1, 2.2, 5, 4, 9, 7],
           "circle-color": ["match", ["get", "v"], "holds", VERDICT_COLOR.holds, "savable", VERDICT_COLOR.savable, VERDICT_COLOR.beyond],
           "circle-opacity": 0.9,
+        },
+      });
+      m.addSource("projects", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      m.addLayer({
+        id: "projects",
+        type: "circle",
+        source: "projects",
+        paint: {
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 1, 4.5, 5, 7, 9, 11],
+          "circle-color": "rgba(0,0,0,0)",
+          "circle-stroke-color": "#0f0f0d",
+          "circle-stroke-width": 1.4,
+          "circle-stroke-opacity": 0.85,
         },
       });
       m.addLayer({
@@ -66,6 +80,14 @@ export function ReefMap({ reefs, verdicts, selected, compact, onPick }: Props) {
       features: reefs.map((r, k) => ({ type: "Feature", properties: { i: r.i, v: verdicts[k] }, geometry: { type: "Point", coordinates: [r.lon, r.lat] } })),
     });
   }, [ready, reefs, verdicts]);
+
+  useEffect(() => {
+    if (!ready) return;
+    (map.current!.getSource("projects") as GeoJSONSource).setData({
+      type: "FeatureCollection",
+      features: projects.map(([lat, lon, cell]) => ({ type: "Feature", properties: { cell }, geometry: { type: "Point", coordinates: [lon, lat] } })),
+    });
+  }, [ready, projects]);
 
   useEffect(() => {
     if (!ready) return;

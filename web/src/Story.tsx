@@ -3,7 +3,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getDepth, getHabitat, getLayer, getYears, type Depth, type Habitat, type Reef, type Years } from "./api";
 import { ATLANTIC, PACIFIC, ReefScene, type Mix, type Taxon } from "./ReefScene";
 import { bleachYears, decadeCount, HOLD_MAX, triageYears, type Triage } from "./model";
-import { ReefMap, VERDICT_COLOR } from "./ReefMap";
+import { ReefMap, VERDICT_COLOR, type Project } from "./ReefMap";
+import { Mark } from "./Mark";
+import { ScanScene } from "./ScanScene";
+import { scanFor } from "./scans";
 
 const GAIN = 0.5;
 
@@ -12,6 +15,8 @@ const VERDICT: Record<Triage, { title: string; line: string; short: string }> = 
   savable: { title: "Restore with heat-tolerant coral", line: "It bleaches too often for today's coral, but coral half a degree tougher would hold.", short: "Needs tougher coral" },
   beyond: { title: "Too hot for today's restoration", line: "Even coral half a degree tougher would bleach too often. Money planted here is likely lost.", short: "Too hot to save" },
 };
+
+type View = "scan" | "rebuilt" | "partner";
 
 type Example = { i: number; name: string; place: string; scan?: string; story?: string };
 
@@ -24,7 +29,8 @@ const EXAMPLES: Example[] = [
 ];
 
 type Pressure = Record<"fishing" | "coastal" | "industry" | "tourism" | "sediment" | "nitrogen" | "pressure" | "connect" | "refuge", number[]>;
-type Data = { reefs: Reef[]; years: Years; pressure: Pressure };
+type Data = { reefs: Reef[]; years: Years; pressure: Pressure; projects: Project[] };
+const NO_PROJECTS: Project[] = [];
 
 const PRESSURES: { k: keyof Pressure; label: string }[] = [
   { k: "fishing", label: "Fishing" },
@@ -39,10 +45,10 @@ const band = (p: number, words: [string, string, string]) => (p < 34 ? words[0] 
 const mainPressure = (pr: Pressure, i: number) => PRESSURES.reduce((a, b) => (pr[b.k][i] > pr[a.k][i] ? b : a));
 const priorityOf = (pr: Pressure, i: number) => 100 - pr.pressure[i] + (pr.connect[i] < 0 ? 50 : pr.connect[i]);
 
-const getPressure = (signal: AbortSignal) =>
-  fetch(`${import.meta.env.BASE_URL}data/pressure.json`, { signal }).then((r) => {
-    if (!r.ok) throw new Error(`Pressure data returned ${r.status}`);
-    return r.json() as Promise<Pressure>;
+const getStatic = <T,>(file: string, signal: AbortSignal) =>
+  fetch(`${import.meta.env.BASE_URL}data/${file}`, { signal }).then((r) => {
+    if (!r.ok) throw new Error(`${file} returned ${r.status}`);
+    return r.json() as Promise<T>;
   });
 
 const reefName = (r: Reef) => {
@@ -95,13 +101,13 @@ export function Story() {
   const about = useRef<HTMLDialogElement>(null);
   const [habitat, setHabitat] = useState<{ i: number; mix: Mix | null } | null>(null);
   const [depth, setDepth] = useState<{ i: number; d: Depth } | null>(null);
-  const [scan, setScan] = useState(false);
+  const [view, setView] = useState<View>("scan");
 
   useEffect(() => {
     const ctl = new AbortController();
     setFailed(null);
-    Promise.all([getLayer(ctl.signal), getYears(ctl.signal), getPressure(ctl.signal)])
-      .then(([layer, years, pressure]) => setData({ reefs: layer.reefs, years, pressure }))
+    Promise.all([getLayer(ctl.signal), getYears(ctl.signal), getStatic<Pressure>("pressure.json", ctl.signal), getStatic<Project[]>("projects.json", ctl.signal)])
+      .then(([layer, years, pressure, projects]) => setData({ reefs: layer.reefs, years, pressure, projects }))
       .catch((e: Error) => !ctl.signal.aborted && setFailed(e.message));
     return () => ctl.abort();
   }, [attempt]);
@@ -133,6 +139,13 @@ export function Story() {
     const n = Math.max(verdicts.length, 1);
     return { holds: c.holds / n, savable: c.savable / n, beyond: c.beyond / n };
   }, [verdicts]);
+
+  const projectShares = useMemo(() => {
+    const c = { holds: 0, savable: 0, beyond: 0 };
+    if (!data) return c;
+    for (const [, , cell] of data.projects) c[verdicts[cell]]++;
+    return c;
+  }, [data, verdicts]);
 
   const ranking = useMemo(() => {
     if (!data) return { order: [] as number[], rank: new Map<number, number>() };
@@ -177,7 +190,7 @@ export function Story() {
 
   function choose(i: number | null) {
     setSel(i);
-    setScan(false);
+    setView("scan");
     setT(i === null || reduce ? null : 0);
     setPlaying(i !== null && !reduce);
   }
@@ -202,42 +215,42 @@ export function Story() {
   const y = data?.years;
   const risk = r && y ? y.ann[year * y.n + r.i] / y.scale : 0;
   const example = r ? EXAMPLES.find((e) => e.i === r.i) : undefined;
+  const scan = r ? scanFor(r) : null;
 
   return (
     <div className="shell">
       <header className="bar">
         <a className="mark" href="#" onClick={(e) => { e.preventDefault(); choose(null); }}>
-          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="#e4f222" /><path d="M5 12.5c2-3 4-3 5-1s3 2 5-1" stroke="#0f0f0d" strokeWidth="1.6" fill="none" strokeLinecap="round" /></svg>
-          Reef Margin
+          <Mark size={28} />
+          coralitics
         </a>
         <button className="ghost" onClick={() => about.current?.showModal()}>How it works</button>
       </header>
 
       <main className="body">
-        <section className="stage" data-reef={r !== null} data-scan={scan}>
-          {data && <ReefMap reefs={data.reefs} verdicts={verdicts} selected={sel} compact={r !== null} onPick={choose} />}
+        <section className="stage" data-reef={r !== null} data-view={view}>
+          {data && <ReefMap reefs={data.reefs} verdicts={verdicts} projects={r ? NO_PROJECTS : data.projects} selected={sel} compact={r !== null} onPick={choose} />}
           {!data && !failed && <div className="stage-wait">Loading 18,445 reefs</div>}
           {r && (
             <div className="specimen">
-              {example?.scan && (
-                <div className="seg" role="group" aria-label="View">
-                  <button aria-pressed={!scan} onClick={() => setScan(false)}>Model</button>
-                  <button aria-pressed={scan} onClick={() => setScan(true)}>Real scan</button>
-                </div>
-              )}
-              {scan && example?.scan ? (
+              <div className="seg" role="group" aria-label="View">
+                <button aria-pressed={view === "scan"} onClick={() => setView("scan")}>Real reef</button>
+                <button aria-pressed={view === "rebuilt"} onClick={() => setView("rebuilt")}>From satellite</button>
+                {example?.scan && <button aria-pressed={view === "partner"} onClick={() => setView("partner")}>Mars reef</button>}
+              </div>
+              {view === "partner" && example?.scan ? (
                 <iframe className="scan" src={example.scan} title="Gaussian splat of a Mars-restored reef in Indonesia" allow="fullscreen; xr-spatial-tracking" />
+              ) : view === "scan" ? (
+                <ScanScene url={`${import.meta.env.BASE_URL}${scan!.file}`} risk={risk} label={`Real reef scan coloured by ${reefName(r).name}'s ${Math.round(risk * 100)}% bleaching risk in ${y!.years[year]}`} />
               ) : habitat?.i === r.i ? (
                 <ReefScene seed={r.i} mix={habitat.mix ?? DEFAULT_MIX} taxa={taxaFor(r)} risk={risk} depth={depth?.i === r.i ? depth.d.median ?? null : null} label={`Reconstructed reef patch for ${reefName(r).name} in ${y!.years[year]}, at ${Math.round(risk * 100)}% bleaching risk`} />
               ) : (
                 <div className="stage-wait light">Mapping this reef from satellite</div>
               )}
-              {!scan && <div className="specimen-year num" aria-live="polite">{y!.years[year]}</div>}
-              {scan ? (
-                <p className="specimen-note">Real 3D scan of a reef in Indonesia restored by Mars. Data: J. Stratford, B. Williams, A. Dwiyanto, Mars Coral Restoration Project, T.B. Razak, T.A.C. Lamont.</p>
-              ) : (
-              <p className="specimen-note">Reconstruction: habitat mix from the Allen Coral Atlas, corals from Smithsonian scans of {r.realm === "Tropical Atlantic" ? "Caribbean" : "Indo-Pacific"} species. Colour follows the model's risk for this reef.</p>
-              )}
+              {view !== "partner" && <div className="specimen-year num" aria-live="polite">{y!.years[year]}</div>}
+              {view === "partner" && <p className="specimen-note">Real 3D scan of a reef in Indonesia restored by Mars. Data: J. Stratford, B. Williams, A. Dwiyanto, Mars Coral Restoration Project, T.B. Razak, T.A.C. Lamont.</p>}
+              {view === "scan" && <p className="specimen-note">{scan!.km < 60 ? `Real 3D scan from ${scan!.place}` : `Real 3D scan from ${scan!.place}, the nearest open scan, ${scan!.km.toLocaleString("en-GB")} km away`} ({scan!.credit}, CC BY 4.0). Corals turn white with this reef's predicted risk.</p>}
+              {view === "rebuilt" && <p className="specimen-note">Rebuilt from this reef's satellite habitat map (Allen Coral Atlas), with Smithsonian scans of {r.realm === "Tropical Atlantic" ? "Caribbean" : "Indo-Pacific"} corals. Colour follows the model's risk.</p>}
             </div>
           )}
         </section>
@@ -272,6 +285,14 @@ export function Story() {
                 ))}
               </div>
               <Warm warm={warm} setWarm={setWarm} />
+              <div className="projects">
+                <h2>Where restoration happens today</h2>
+                <p className="projects-lede"><span className="ring" aria-hidden="true" />{data.projects.length} restoration projects from a global review (Boström-Einarsson et al. 2020). Not one named heat as a reason for its site.</p>
+                <div className="projects-n">
+                  <span className="num" style={{ color: VERDICT_COLOR.beyond }}><NumberFlow value={Math.round((projectShares.beyond / Math.max(1, data.projects.length)) * 100)} suffix="%" /></span>
+                  <span>are on reefs too hot to save{warm ? " with 0.5 °C more warming" : " today"}.{warm ? "" : " Turn on warming above."}</span>
+                </div>
+              </div>
               <h2>Best places to restore</h2>
               <p className="fine sub">Reefs that need help, would hold with heat-tolerant coral, and face the least local pressure.</p>
               <ul className="list">
@@ -303,6 +324,7 @@ export function Story() {
                 })}
               </ul>
               <p className="fine">Or click any dot on the map. Each one is 5 km of reef.</p>
+              <p className="proof"><span className="proof-n num">0.84</span><span>Accuracy (AUROC) on 201 bleaching surveys from 2021 to 2025 that the model never saw, in 10 countries (MERMAID).</span></p>
             </>
           )}
 
@@ -320,20 +342,26 @@ export function Story() {
             <dd>Gradient-boosted trees trained on daily NOAA sea temperature since 1985, at 5 km, and 17,332 diver surveys from the Global Coral Bleaching Database. It predicts the chance that at least 30% of a reef's corals bleach.</dd>
             <dt>Tested on years it never saw</dt>
             <dd>Trained on surveys up to 2013, scored on 2016 to 2020. It ranks bleaching better than NOAA's standard heat alert: 0.935 against 0.906 (AUROC, 2,771 surveys).</dd>
+            <dt>Checked against new surveys</dt>
+            <dd>MERMAID, WCS's open reef survey platform, holds 201 bleaching surveys from 2021 to 2025 in 10 countries, all after our training data ends. The model ranks them at 0.84 AUROC for 30% or more of corals bleached.</dd>
+            <dt>What protection is worth</dt>
+            <dd>In 3,385 MERMAID coral surveys, compared within the same country, each bleaching year in the past decade went with 1.9 fewer points of hard coral cover. No-take reserves held 3.2 more points and about twice the fish. So a reserve is worth roughly 1.7 bleaching years. This is an association across sites, not a controlled trial.</dd>
             <dt>A bleaching year</dt>
             <dd>A year in which the model put the reef past 50% risk at its hottest month. Fast-growing corals need 10 to 15 years to recover (Hughes et al. 2018), so a reef holds if this happens 2 or fewer years in 10.</dd>
             <dt>Depth</dt>
             <dd>From the sharpest open survey that covers the reef: NOAA's 3 m depth models for US reefs, Digital Earth Pacific's 10 m satellite depth for Pacific islands, and Geoscience Australia's 30 m model for the Great Barrier Reef. Deeper reefs are shown darker and bluer. Depth is not a model input.</dd>
             <dt>Heat-tolerant coral</dt>
             <dd>Selective breeding and assisted gene flow aim to give corals more heat tolerance. We model a gain of 0.5 °C as the same reef in cooler water.</dd>
+            <dt>Restoration projects</dt>
+            <dd>The 304 projects in Boström-Einarsson et al. (2020, PLoS ONE, data on Dryad). 224 sit within 25 km of a reef we score. The review records why each site was chosen: an existing restoration site, a disturbance, logistics or "favourable conditions". None names heat or bleaching. With 0.5 °C more warming, 66% of these projects would sit on reefs too hot for today's coral.</dd>
             <dt>Will it recover?</dt>
             <dd>Local pressure comes from WCS's global map of six human pressures on reefs (Andrello et al. 2022): fishing, nitrogen and sediment runoff, coastal population, tourism, and ports. Connection to other reefs, which brings in coral larvae, comes from the 50 Reefs analysis (Beyer et al. 2018). Neither changes the bleaching model. They rank where restoration is most likely to last.</dd>
             <dt>Limits and safeguards</dt>
             <dd>Surveys are densest in Australia, the Caribbean and Southeast Asia, so the model is least sure elsewhere. It shows where heat makes restoration hard. It does not decide for the people who depend on a reef. A reef marked too hot still needs protection, and the call stays with local communities. Heat-tolerant coral from breeding or assisted gene flow can cut genetic diversity, so sourcing stays local and is monitored. Code and data are open so anyone can check the numbers.</dd>
             <dt>Open source</dt>
-            <dd>Reef Margin is an open, community-led tool. The model, the data joins and this map are public, built only on open data. Restoration teams and divers can add their own surveys, which retrain the model and make it surer where it is weakest today.</dd>
+            <dd>Coralitics is an open, community-led tool. The model, the data joins and this map are public, built only on open data. Restoration teams and divers can add their own surveys, which retrain the model and make it surer where it is weakest today.</dd>
             <dt>The reef you see</dt>
-            <dd>A reconstruction, not a photo. The mix of coral, rock, rubble, sand and seagrass comes from the Allen Coral Atlas satellite map of this reef. The corals are Smithsonian scans (CC0) of species from the same ocean. Each year the model's risk sets how many colonies bleach, sensitive species first, as in past heatwaves (Loya et al. 2001).</dd>
+            <dd>Real 3D scans of reefs, all CC BY 4.0: Soneva and Wildflow's Gaussian splats of Maldives restoration plots, the Galapagos_3D survey (Yuval, Keith et al.), and diver photogrammetry from the Great Barrier Reef, Belize, the US Virgin Islands, Okinawa, Hawaii, Mayotte and Thailand shared on Sketchfab. Each reef shows the nearest scan. Each year, colourful living tissue turns white in colony-sized patches as the model's risk for that reef rises. "From satellite" instead rebuilds the reef from its Allen Coral Atlas habitat map with Smithsonian coral scans (CC0).</dd>
           </dl>
           <div className="about-foot">
             <a href="#classic" onClick={() => window.location.reload()}>Open the full explorer</a>
@@ -486,7 +514,7 @@ function Recover({ pr, i, verdict, rank, ranked }: { pr: Pressure; i: number; ve
       <dl className="facts">
         <div><dt>Local pressure</dt><dd>{band(pr.pressure[i], ["Low", "Moderate", "High"])}<span className="sub">Worse than {pr.pressure[i]}% of reefs. Mostly {main.label.toLowerCase()}.</span></dd></div>
         {pr.connect[i] >= 0 && <div><dt>Coral larvae from other reefs</dt><dd>{band(pr.connect[i], ["Few", "Average", "Many"])}<span className="sub">{pr.refuge[i] ? "One of the 50 Reefs climate refuges." : "Helps a restored reef reseed itself."}</span></dd></div>}
-        <div><dt>Best action</dt><dd>{verdict === "savable" ? (top !== null ? `Restore, top ${top}% priority` : "Restore") : verdict === "holds" ? (pr.pressure[i] >= 67 ? `Cut ${main.label.toLowerCase()}` : "Protect it") : "Spend elsewhere"}<span className="sub">{verdict === "savable" ? `Ranked among ${ranked.toLocaleString("en-GB")} reefs that need heat-tolerant coral, by local pressure and larvae.` : verdict === "holds" ? (pr.pressure[i] >= 67 ? "Heat still lets it recover. Local pressure is the bigger threat." : "Heat lets it recover on its own.") : "Heat would undo the work. Protection still matters for the people who use it."}</span></dd></div>
+        <div><dt>Best action</dt><dd>{verdict === "savable" ? (top !== null ? `Restore, top ${top}% priority` : "Restore") : verdict === "holds" ? (pr.pressure[i] >= 67 ? `Cut ${main.label.toLowerCase()}` : "Protect it") : "Spend elsewhere"}<span className="sub">{verdict === "savable" ? `Ranked among ${ranked.toLocaleString("en-GB")} reefs that need heat-tolerant coral, by local pressure and larvae.` : verdict === "holds" ? (pr.pressure[i] >= 67 ? "Heat still lets it recover. In surveys, no-take reserves hold about 3 more points of coral." : "Heat lets it recover on its own.") : "Heat would undo the work. Protection still matters for the people who use it."}</span></dd></div>
       </dl>
     </div>
   );

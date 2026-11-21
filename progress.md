@@ -117,3 +117,17 @@ Outlier persistence (sites with DHW>=4 in both periods): 24 sites, rho 0.31 (p 0
 - Stopped the app, made `pipeline` skip finished stages (`ckpt/<name>.done`, existing trees and corpus), redeployed, relaunched as fc-01M7ZESW0NE4RS6D7KJD29ESQY. GBR depth download relaunched as fc-01M7ZESWATFD203KAAZMJQ12GH (curl was missing; now uses requests).
 
 - Entity type for Realism: Open-source / Community-led (user choice, 21 Nov). About dialog has an "Open source" entry. Repo is still private; making it public is the user's call.
+
+## Real reef scans and outside evidence 17:10
+- Real Gaussian splats: Soneva Maldives restoration plots (wildflow/soneva-corals on Hugging Face, CC BY 4.0), 6 plots, lod2 (~450k splats) converted to `.splat` by `tools/splat_convert.py` (PCA levelling, floater removal, SH dropped). Rebuild with `tools/fetch_scans.sh`; output in `web/public/scans/` (gitignored, 88 MB).
+- `ScanScene.tsx` renders them with Spark 2.4 (three bumped to 0.180). A dyno GLSL modifier whitens colourful mid-tone splats in noise-shaped colony patches as the model risk rises; easing is time-based.
+- Stage tabs: "Real reef" (default, scan), "From satellite" (old reconstruction), "Mars reef" (Spermonde only, SuperSplat iframe).
+- MERMAID (WCS open surveys, no login): `tools/mermaid_check.py` reproduces: bleaching AUROC 0.906 on 772 surveys, 0.840 on 201 surveys from 2021+ (10 countries, after training data); coral cover per bleaching year -1.91 points (p<0.001); no-take +3.21 points (p=0.002); no-take fish biomass x2.12. Shown in home panel ("proof" line) and About.
+- Tried and rejected: a coral-cover model (country hold-out R2 -0.38) and a recovery model from repeat surveys (409 pairs, nothing significant). Not shipped.
+- Reef soundscapes (bens-bots/marrs-global-coral-reef-soundscapes, CC BY 4.0) checked: daytime raw clips do not separate healthy from degraded by energy. Not used yet.
+- Boström-Einarsson restoration database (Dryad) is behind a bot check; needs a browser download to `data/restoration/`.
+
+## Coralitics, scans everywhere, restoration projects 17:40
+- Renamed to Coralitics. Logo: "02 Decade ring" (user choice) from `design/logo-variants.html`. Mark = 22 year ticks forming a C, brown to bleached. `web/src/Mark.tsx`, assets in `web/public/brand/` (colour, black, white, icon). GitHub repo still named reef-margin; renaming it is the user's call.
+- Real scans from 18 files: 6 Soneva (Maldives), 2 Galapagos_3D (Zenodo 14914807, point clouds -> disc splats via `tools/points_convert.py`), 10 Sketchfab CC BY meshes (GBR Heron/One Tree/Whitsundays, Belize, USVI x2, Okinawa, Maui, Mayotte, Thailand; `tools/mesh_convert.py` samples textured surfaces into disc splats). `web/src/scans.ts` picks the nearest scan per reef and the label states the distance. Sketchfab needs SKETCHFAB_TOKEN for `tools/fetch_scans.sh`.
+- Restoration projects: Boström-Einarsson et al. 2020 database (user downloaded from Dryad; in `data/restoration/`). 304 projects, 224 within 25 km of a scored reef (`web/public/data/projects.json`). No project's location rationale names heat or bleaching. Today: 134 savable, 76 hold, 14 beyond (6%). At +0.5 C: 148 beyond (66%), 0 hold. Survival vs recent heat: no significant difference (short monitoring). Map shows projects as rings; home panel counts live with the warming switch.
