@@ -38,7 +38,7 @@ h1, h2 { margin: 0; letter-spacing: -0.01em; }
 
 .body { display: grid; grid-template-columns: minmax(0, 1fr) 440px; gap: 8px; padding: 0 16px 16px; min-height: 0; }
 .stage { position: relative; border-radius: 24px; overflow: hidden; background: var(--surface); min-height: 0; }
-.reefmap { position: absolute; inset: 0; transition: inset 480ms var(--ease), border-radius 480ms var(--ease), box-shadow 480ms var(--ease); }
+.reefmap { position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, #f4f8fb 0%, #e6eef4 70%, #dde7ee 100%); transition: inset 480ms var(--ease), border-radius 480ms var(--ease), box-shadow 480ms var(--ease); }
 .stage[data-reef="true"] .reefmap { inset: auto auto 16px 16px; width: 240px; height: 160px; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-menu); z-index: 2; }
 .stage-wait { position: absolute; inset: 0; display: grid; place-items: center; color: var(--fg-3); font-size: 14px; }
 

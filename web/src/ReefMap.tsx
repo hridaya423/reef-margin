@@ -2,6 +2,8 @@ import maplibregl, { type GeoJSONSource, type Map as MLMap } from "maplibre-gl";
 import { useEffect, useRef, useState } from "react";
 import type { Reef } from "./api";
 
+const homeZoom = (el: HTMLElement) => Math.log2((0.44 * Math.min(el.clientWidth, el.clientHeight) * 2 * Math.PI) / 512) + 0.22;
+const SPIN = 0.004;
 const STYLE = "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json";
 export const VERDICT_COLOR = { holds: "#1e8e4a", savable: "#c27a00", beyond: "#d93636" } as const;
 
@@ -16,7 +18,12 @@ export function ReefMap({ reefs, verdicts, projects, selected, focus, compact, o
   pick.current = onPick;
 
   useEffect(() => {
-    const m = new maplibregl.Map({ container: el.current!, style: STYLE, center: [150, -5], zoom: 1.6, minZoom: 1, dragRotate: false, attributionControl: { compact: true } });
+    const m = new maplibregl.Map({ container: el.current!, style: STYLE, center: [150, -5], zoom: homeZoom(el.current!), minZoom: 0.6, dragRotate: false, attributionControl: { compact: true } });
+    m.on("style.load", () => {
+      m.setProjection({ type: "globe" });
+      m.setPaintProperty("water", "fill-color", "#c6dbe8");
+      m.setSky({ "sky-color": "#b9d4e6", "horizon-color": "#e4eff6", "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 4, 0.5, 7, 0] });
+    });
     m.on("load", () => {
       m.addSource("reefs", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
       m.addLayer({
@@ -106,8 +113,33 @@ export function ReefMap({ reefs, verdicts, projects, selected, focus, compact, o
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const m = map.current!;
     if (focus) m.fitBounds(focus, { padding: 60, maxZoom: 6, duration: reduce ? 0 : 1000 });
-    else m.flyTo({ center: [150, -5], zoom: 1.6, duration: reduce ? 0 : 1000 });
+    else m.flyTo({ center: [m.getCenter().lng, -5], zoom: homeZoom(el.current!), duration: reduce ? 0 : 1000 });
   }, [ready, focus, selected]);
+
+  useEffect(() => {
+    if (!ready || selected !== null || focus || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const m = map.current!;
+    let spin = true;
+    let raf = 0;
+    let last = performance.now();
+    const stop = () => (spin = false);
+    const events = ["mousedown", "touchstart", "wheel", "dragstart"] as const;
+    events.forEach((e) => m.on(e, stop));
+    const tick = (t: number) => {
+      const dt = Math.min(t - last, 100);
+      last = t;
+      if (spin && !m.isMoving()) {
+        const c = m.getCenter();
+        m.setCenter([c.lng + dt * SPIN, c.lat]);
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      events.forEach((e) => m.off(e, stop));
+    };
+  }, [ready, selected, focus]);
 
   return <div ref={el} className="reefmap" role="application" aria-label="World map of coral reefs, coloured by verdict" />;
 }
