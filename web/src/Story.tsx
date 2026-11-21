@@ -1,5 +1,5 @@
 import NumberFlow from "@number-flow/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Component, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { getDepth, getHabitat, getLayer, getYears, type Depth, type Habitat, type Reef, type Years } from "./api";
 import { ATLANTIC, PACIFIC, ReefScene, type Mix, type Taxon } from "./ReefScene";
 import { bleachYears, decadeCount, gainNeeded, HOLD_MAX, type ReefYear, reefHistory, triageYears, type Triage } from "./model";
@@ -17,12 +17,14 @@ const VERDICT: Record<Triage, { title: string; short: string }> = {
   beyond: { title: "Too hot for today's restoration", short: "Too hot to save" },
 };
 
-const verdictLine = (v: Triage, g: number) =>
+const verdictLine = (v: Triage, g: number, need: number | null) =>
   v === "holds"
     ? "Bleaching-level heat hit it 2 or fewer years in 10. Corals here have time to recover."
     : v === "savable"
-      ? `It bleaches too often for today's coral, but coral bred to handle water ${g} °C warmer would hold.`
-      : `Even coral bred to handle water ${g} °C warmer would bleach too often. Money planted here is likely lost.`;
+      ? `It bleaches too often for today's coral, but coral bred ${need ?? g} °C tougher would hold.`
+      : need !== null
+        ? `It needs coral bred ${need} °C tougher, more than the +${g} °C breeding target. Money planted here is likely lost.`
+        : "No coral we model would hold here. Money planted here is likely lost.";
 
 type View = "scan" | "rebuilt" | "partner";
 
@@ -103,6 +105,17 @@ const coverBar = (h: ReefYear) => {
 function readReef() {
   const v = new URLSearchParams(window.location.hash.slice(1)).get("reef");
   return v === null ? null : Number(v);
+}
+
+class Needs3D extends Component<{ children: ReactNode; what: string }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return <div className="stage-wait">This browser has 3D graphics (WebGL) turned off, so the {this.props.what} cannot be drawn. The numbers alongside still work.</div>;
+  }
 }
 
 export function Story() {
@@ -310,7 +323,11 @@ export function Story() {
 
       <main className="body">
         <section className="stage" data-reef={r !== null} data-view={view}>
-          {data && <ReefMap reefs={data.reefs} verdicts={verdicts} projects={r ? NO_PROJECTS : data.projects} selected={sel} focus={focus} compact={r !== null} onPick={choose} />}
+          {data && (
+            <Needs3D what="map">
+              <ReefMap reefs={data.reefs} verdicts={verdicts} projects={r ? NO_PROJECTS : data.projects} selected={sel} focus={focus} compact={r !== null} onPick={choose} />
+            </Needs3D>
+          )}
           {!data && !failed && <div className="stage-wait">Loading 18,445 reefs</div>}
           {data && !r && (
             <ul className="maplegend" aria-label="Map legend">
@@ -328,13 +345,17 @@ export function Story() {
               {view === "partner" && example?.scan ? (
                 <iframe className="scan" src={example.scan} title="Gaussian splat of a Mars-restored reef in Indonesia" allow="fullscreen; xr-spatial-tracking" />
               ) : view === "scan" ? (
-                <ScanScene url={`${import.meta.env.BASE_URL}${scan!.file}`} white={now!.white} dead={now!.dead} label={`Real reef scan coloured by ${reefName(r).name}'s ${Math.round(risk * 100)}% bleaching risk in ${y!.years[year]}`} onReady={() => setLoaded(scan!.file)} />
+                <Needs3D key={scanFile} what="reef scan">
+                  <ScanScene url={`${import.meta.env.BASE_URL}${scan!.file}`} white={now!.white} dead={now!.dead} label={`Real reef scan coloured by ${reefName(r).name}'s ${Math.round(risk * 100)}% bleaching risk in ${y!.years[year]}`} onReady={() => setLoaded(scan!.file)} />
+                  {loaded !== scanFile && <div className="stage-wait light loading">Loading the real reef scan…</div>}
+                </Needs3D>
               ) : habitat?.i === r.i ? (
-                <ReefScene seed={r.i} mix={habitat.mix ?? DEFAULT_MIX} taxa={taxaFor(r)} risk={risk} depth={depth?.i === r.i ? depth.d.median ?? null : null} label={`Reconstructed reef patch for ${reefName(r).name} in ${y!.years[year]}, at ${Math.round(risk * 100)}% bleaching risk`} />
+                <Needs3D what="reef">
+                  <ReefScene seed={r.i} mix={habitat.mix ?? DEFAULT_MIX} taxa={taxaFor(r)} risk={risk} depth={depth?.i === r.i ? depth.d.median ?? null : null} label={`Reconstructed reef patch for ${reefName(r).name} in ${y!.years[year]}, at ${Math.round(risk * 100)}% bleaching risk`} />
+                </Needs3D>
               ) : (
                 <div className="stage-wait light">Mapping this reef from satellite</div>
               )}
-              {view === "scan" && loaded !== scanFile && <div className="stage-wait light loading">Loading the real reef scan…</div>}
               {view !== "partner" && (
                 <div className="specimen-year" aria-live="polite">
                   <span className="num">{y!.years[year]}</span>
@@ -521,7 +542,7 @@ function ReefPanel(p: { history: ReefYear[]; loss: Loss; pressure: Pressure; ran
 
       <div className="verdict" style={{ ["--v" as string]: VERDICT_COLOR[p.verdict] }}>
         <div className="verdict-title"><span className="dot" />{v.title}</div>
-        <p>{verdictLine(p.verdict, p.gain)}</p>
+        <p>{verdictLine(p.verdict, p.gain, need)}</p>
       </div>
       {p.example?.story && <p className="story">{p.example.story} {bleachYears(y, r.i, 0.5) > HOLD_MAX && bleachYears(y, r.i, 0) <= HOLD_MAX ? `Today it holds. With half a degree more warming it would bleach ${bleachYears(y, r.i, 0.5)} years in 10.` : ""}</p>}
 
@@ -545,10 +566,10 @@ function ReefPanel(p: { history: ReefYear[]; loss: Loss; pressure: Pressure; ran
         </dl>
         <p className="outcome" style={{ ["--v" as string]: VERDICT_COLOR[p.verdict] }}>
           {p.verdict === "holds"
-            ? "Today's coral survives the heat here. Protect the reef and people keep all of this."
+            ? "Protect the reef and people keep this."
             : p.verdict === "savable"
-              ? `Today's coral bleaches too often here. Restore it with coral bred ${need ?? p.gain} °C tougher and people keep this.`
-              : `Even coral bred ${p.gain} °C tougher would bleach too often here. Restoring it is unlikely to keep this.`}
+              ? "Restore it with heat-tolerant coral and people keep this."
+              : "Heat is likely to kill this reef even if restored, so people are likely to lose this."}
         </p>
       </div>
 
