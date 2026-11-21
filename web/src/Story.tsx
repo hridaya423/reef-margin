@@ -1,6 +1,6 @@
 import NumberFlow from "@number-flow/react";
 import { Component, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { getDepth, getHabitat, getLayer, getYears, type Depth, type Habitat, type Reef, type Years } from "./api";
+import { getDepth, getHabitat, getLayer, getReef, getYears, type Depth, type Habitat, type Reef, type Survey, type Years } from "./api";
 import { ATLANTIC, PACIFIC, ReefScene, type Mix, type Taxon } from "./ReefScene";
 import { bleachYears, decadeCount, gainNeeded, HOLD_MAX, type ReefYear, reefHistory, triageYears, type Triage } from "./model";
 import { ReefMap, VERDICT_COLOR, type Project } from "./ReefMap";
@@ -133,6 +133,7 @@ export function Story() {
   const about = useRef<HTMLDialogElement>(null);
   const [habitat, setHabitat] = useState<{ i: number; mix: Mix | null } | null>(null);
   const [depth, setDepth] = useState<{ i: number; d: Depth } | null>(null);
+  const [surveys, setSurveys] = useState<{ i: number; s: Survey[] | null } | null>(null);
   const [view, setView] = useState<View>("scan");
   const [query, setQuery] = useState("");
 
@@ -161,6 +162,9 @@ export function Story() {
     getDepth(r.lat, r.lon, ctl.signal)
       .then((d) => setDepth({ i: sel, d }))
       .catch(() => setDepth({ i: sel, d: { source: null } }));
+    getReef(sel, 0, null, ctl.signal)
+      .then((d) => setSurveys({ i: sel, s: d.surveys }))
+      .catch(() => !ctl.signal.aborted && setSurveys({ i: sel, s: null }));
     return () => ctl.abort();
   }, [data, sel]);
 
@@ -446,7 +450,7 @@ export function Story() {
           )}
 
           {data && r && y && (
-            <ReefPanel history={history!} loss={{ people: data.people.pop[r.i], tourism: data.impact.tourism[r.i], flood: data.impact.flood[r.i] }} pressure={data.pressure} rank={ranking.rank.get(r.i)} ranked={ranking.order.length} example={example} depth={depth?.i === r.i ? depth.d : undefined} mix={habitat?.i === r.i ? habitat.mix : undefined} r={r} y={y} verdict={verdicts[r.i]} gain={gain} shift={shift} year={year} setYear={(k) => { setPlaying(false); setT(k); }} playing={playing} play={play} warm={warm} setWarm={setWarm} back={() => choose(null)} />
+            <ReefPanel surveys={surveys?.i === r.i ? surveys.s : undefined} history={history!} loss={{ people: data.people.pop[r.i], tourism: data.impact.tourism[r.i], flood: data.impact.flood[r.i] }} pressure={data.pressure} rank={ranking.rank.get(r.i)} ranked={ranking.order.length} example={example} depth={depth?.i === r.i ? depth.d : undefined} mix={habitat?.i === r.i ? habitat.mix : undefined} r={r} y={y} verdict={verdicts[r.i]} gain={gain} shift={shift} year={year} setYear={(k) => { setPlaying(false); setT(k); }} playing={playing} play={play} warm={warm} setWarm={setWarm} back={() => choose(null)} />
           )}
         </aside>
       </main>
@@ -524,7 +528,7 @@ function Warm({ warm, setWarm }: { warm: boolean; setWarm: (v: boolean) => void 
   );
 }
 
-function ReefPanel(p: { history: ReefYear[]; loss: Loss; pressure: Pressure; rank: number | undefined; ranked: number; example: Example | undefined; depth: Depth | undefined; mix: Mix | null | undefined; r: Reef; y: Years; verdict: Triage; gain: number; shift: number; year: number; setYear: (k: number) => void; playing: boolean; play: () => void; warm: boolean; setWarm: (v: boolean) => void; back: () => void }) {
+function ReefPanel(p: { surveys: Survey[] | null | undefined; history: ReefYear[]; loss: Loss; pressure: Pressure; rank: number | undefined; ranked: number; example: Example | undefined; depth: Depth | undefined; mix: Mix | null | undefined; r: Reef; y: Years; verdict: Triage; gain: number; shift: number; year: number; setYear: (k: number) => void; playing: boolean; play: () => void; warm: boolean; setWarm: (v: boolean) => void; back: () => void }) {
   const { r, y } = p;
   const name = reefName(r);
   const now = bleachYears(y, r.i, p.shift);
@@ -602,6 +606,8 @@ function ReefPanel(p: { history: ReefYear[]; loss: Loss; pressure: Pressure; ran
 
       <Warm warm={p.warm} setWarm={p.setWarm} />
 
+      <Checks surveys={p.surveys} />
+
       <Recover pr={p.pressure} i={r.i} verdict={p.verdict} rank={p.rank} ranked={p.ranked} />
 
       <div className="onreef">
@@ -631,6 +637,65 @@ function ReefPanel(p: { history: ReefYear[]; loss: Loss; pressure: Pressure; ran
         <p className="fine">Mapped from satellite within 7 km (Allen Coral Atlas). In the scene, {taxaFor(r)[0].name.toLowerCase()} bleaches first and {taxaFor(r)[taxaFor(r).length - 1].name.toLowerCase()} last, the order seen in past heatwaves (Loya et al. 2001).</p>
       </div>
     </>
+  );
+}
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+function Tick({ ok }: { ok: boolean }) {
+  return <span className={ok ? "ok" : "miss"} aria-label={ok ? "right" : "wrong"}>{ok ? "✓" : "✗"}</span>;
+}
+
+function Checks({ surveys }: { surveys: Survey[] | null | undefined }) {
+  if (surveys === null) return null;
+  if (surveys === undefined) {
+    return (
+      <div className="onreef">
+        <h2>Checked against divers</h2>
+        <p className="fine">Loading diver surveys…</p>
+      </div>
+    );
+  }
+  if (surveys.length === 0) {
+    return (
+      <div className="onreef">
+        <h2>Checked against divers</h2>
+        <p className="checks-sum">No diver has surveyed this reef. Across 17,325 surveys elsewhere, Coralytics called bleaching right 79% of the time and NOAA's heat alert 76%. Since 2016 it is 85% against 80%.</p>
+      </div>
+    );
+  }
+  const rows = surveys
+    .map(([yr, mo, pct, dhw, resid]) => {
+      const bleached = pct >= 10;
+      const p = (bleached ? 1 : 0) - resid;
+      return { yr, mo, pct, dhw, p, bleached, noaa: dhw >= 4 === bleached, ours: p >= 0.5 === bleached };
+    })
+    .sort((a, b) => Number(b.noaa !== b.ours) - Number(a.noaa !== a.ours) || Number(b.bleached) - Number(a.bleached) || b.yr - a.yr || b.mo - a.mo);
+  const ours = rows.filter((x) => x.ours).length;
+  const noaa = rows.filter((x) => x.noaa).length;
+  const shown = rows.slice(0, 6);
+  return (
+    <div className="onreef">
+      <h2>Checked against divers</h2>
+      <p className="checks-sum">Divers surveyed this reef {rows.length === 1 ? "once" : `${rows.length} times`}. Coralytics called it right {ours} of {rows.length}. NOAA's heat alert: {noaa} of {rows.length}.</p>
+      <table className="checks">
+        <thead>
+          <tr><th>Survey</th><th>Divers saw</th><th>NOAA alert</th><th>Coralytics chance</th></tr>
+        </thead>
+        <tbody>
+          {shown.map((x, k) => (
+            <tr key={k}>
+              <td className="num">{MONTHS[x.mo - 1]} {x.yr}</td>
+              <td className="num">{x.bleached ? <b>{Math.round(x.pct)}% bleached</b> : `${Math.round(x.pct)}% bleached`}</td>
+              <td><Tick ok={x.noaa} /> {x.dhw >= 4 ? "Alert" : "None"}</td>
+              <td><Tick ok={x.ours} /> <span className="num">{Math.round(x.p * 100)}%</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {rows.length > shown.length && <p className="fine">Showing {shown.length} of {rows.length}: surveys where the two disagree first, then bleaching years.</p>}
+      <p className="fine">Bleached means 10% or more of the coral. NOAA's alert means 4 or more degree heating weeks. Coralytics shows its bleaching chance; 50% or more counts as a yes. These calls come from a version of the model that never saw a survey from this region.</p>
+    </div>
   );
 }
 

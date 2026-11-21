@@ -216,3 +216,10 @@ h1, h2 { margin: 0; letter-spacing: -0.01em; }
 .sort button:focus-visible { outline: 2px solid var(--accent-line); outline-offset: 2px; }
 .stage-wait.loading { z-index: 2; pointer-events: none; font-size: 15px; font-weight: 500; text-shadow: 0 1px 8px rgb(0 40 60 / 0.35); }
 .outcome { font-weight: 500; }
+.checks-sum { margin: 8px 0 0; font-size: 14px; line-height: 20px; color: var(--fg); font-weight: 500; }
+.checks { width: 100%; margin-top: 12px; border-collapse: collapse; font-size: 13px; line-height: 18px; }
+.checks th { text-align: left; font-weight: 500; color: var(--fg-3); padding: 0 8px 6px 0; border-bottom: 1px solid var(--line); }
+.checks td { padding: 7px 8px 7px 0; border-bottom: 1px solid var(--line); color: var(--fg-2); white-space: nowrap; }
+.checks td b { color: var(--fg); font-weight: 600; }
+.checks .ok { color: #1e8e4a; font-weight: 700; }
+.checks .miss { color: #d93636; font-weight: 700; }
