@@ -43,6 +43,7 @@ type Loss = { people: number; tourism: number; flood: number };
 type Data = { reefs: Reef[]; years: Years; pressure: Pressure; projects: Project[]; people: People; impact: Impact };
 
 const peopleText = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)} million` : n.toLocaleString("en-GB"));
+const shortPeople = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}k` : String(n));
 const usdText = (n: number) => (n >= 1e9 ? `$${(n / 1e9).toFixed(1)} billion` : n >= 1e6 ? `$${(n / 1e6).toFixed(n >= 1e7 ? 0 : 1)} million` : `$${Math.round(n / 1000).toLocaleString("en-GB")},000`);
 const NO_PROJECTS: Project[] = [];
 
@@ -114,6 +115,7 @@ export function Story() {
   const [t, setT] = useState<number | null>(null);
   const [playing, setPlaying] = useState(false);
   const [autoplay, setAutoplay] = useState(false);
+  const [sortBy, setSortBy] = useState<"odds" | "people">("odds");
   const [loaded, setLoaded] = useState<string | null>(null);
   const about = useRef<HTMLDialogElement>(null);
   const [habitat, setHabitat] = useState<{ i: number; mix: Mix | null } | null>(null);
@@ -200,7 +202,10 @@ export function Story() {
     return e - w > 180 ? null : [w, so, e, n];
   }, [data, matches]);
 
-  const scoped = useMemo(() => (matches ? ranking.order.filter((i) => matches.has(i)) : ranking.order), [ranking, matches]);
+  const scoped = useMemo(() => {
+    const base = matches ? ranking.order.filter((i) => matches.has(i)) : ranking.order;
+    return sortBy === "people" && data ? [...base].sort((a, b) => data.people.pop[b] - data.people.pop[a]) : base;
+  }, [ranking, matches, sortBy, data]);
 
   const shortlist = useMemo(() => {
     if (!data) return [];
@@ -329,6 +334,7 @@ export function Story() {
               ) : (
                 <div className="stage-wait light">Mapping this reef from satellite</div>
               )}
+              {view === "scan" && loaded !== scanFile && <div className="stage-wait light loading">Loading the real reef scan…</div>}
               {view !== "partner" && (
                 <div className="specimen-year" aria-live="polite">
                   <span className="num">{y!.years[year]}</span>
@@ -390,6 +396,10 @@ export function Story() {
                 <h2>Best places to restore{matches ? ` in "${query.trim()}"` : ""}</h2>
                 {scoped.length > 0 && <button className="ghost small" onClick={download}>Download {scoped.length.toLocaleString("en-GB")} as CSV</button>}
               </div>
+              <div className="sort" role="group" aria-label="Sort restoration sites">
+                <button aria-pressed={sortBy === "odds"} onClick={() => setSortBy("odds")}>Best odds of lasting</button>
+                <button aria-pressed={sortBy === "people"} onClick={() => setSortBy("people")}>Most people nearby</button>
+              </div>
               {shortlist.length === 0 && <p className="fine">No reef here needs heat-tolerant coral{warm ? "" : " today"}. Try turning on warming, or another search.</p>}
               <ul className="list">
                 {shortlist.map((i, k) => {
@@ -400,13 +410,13 @@ export function Story() {
                       <button className="item" onClick={() => choose(i)}>
                         <span className="rank num">{k + 1}</span>
                         <span className="grow"><span className="item-name">{n.name}</span><span className="item-place">{n.place}</span></span>
-                        <span className="cols num"><span>{bleachYears(data.years, i, shift)}/10</span><span>{band(data.pressure.pressure[i], ["Low", "Mid", "High"])}</span></span>
+                        <span className="cols num"><span>{bleachYears(data.years, i, shift)}/10</span><span>{sortBy === "people" ? shortPeople(data.people.pop[i]) : band(data.pressure.pressure[i], ["Low", "Mid", "High"])}</span></span>
                       </button>
                     </li>
                   );
                 })}
               </ul>
-              {shortlist.length > 0 && <p className="fine">Reefs that bleach too often today but would hold with coral bred {gainText(gain)} tougher, ranked by local pressure and larvae from nearby reefs. Columns: bleaching years in the last 10, local pressure.</p>}
+              {shortlist.length > 0 && <p className="fine">Reefs that bleach too often today but would hold with coral bred {gainText(gain)} tougher, {sortBy === "people" ? "ranked by people living within 50 km. Columns: bleaching years in the last 10, people within 50 km." : "ranked by local pressure and larvae from nearby reefs. Columns: bleaching years in the last 10, local pressure."}</p>}
               <div className="chips">
                 <span>Examples</span>
                 {EXAMPLES.map((e) => <button key={e.i} onClick={() => choose(e.i)}>{e.name}</button>)}
@@ -530,7 +540,7 @@ function ReefPanel(p: { history: ReefYear[]; loss: Loss; pressure: Pressure; ran
         <h2>If this reef dies, people lose</h2>
         <dl className="facts">
           <div><dt>Tourism income</dt><dd>{p.loss.tourism > 0 ? `${usdText(p.loss.tourism)} a year` : "None recorded"}<span className="sub">What reef visitors spend within 25 km.</span></dd></div>
-          <div><dt>Flood protection</dt><dd>{p.loss.flood > 0 ? `${peopleText(p.loss.flood)} people` : "None recorded"}<span className="sub">Coastal residents within 25 km the reef shields from storm floods.</span></dd></div>
+          <div><dt>Flood protection</dt><dd>{p.loss.flood > 0 ? `${peopleText(p.loss.flood)} people` : p.loss.people > 0 ? "No estimate" : "None"}<span className="sub">{p.loss.flood > 0 || p.loss.people === 0 ? "Coastal residents within 25 km the reef shields from storm floods." : "The global flood study has no figure for this coast."}</span></dd></div>
           <div><dt>Neighbours</dt><dd>{p.loss.people > 0 ? `${peopleText(p.loss.people)} people` : "No one"}<span className="sub">Live within 50 km.</span></dd></div>
         </dl>
         <p className="outcome" style={{ ["--v" as string]: VERDICT_COLOR[p.verdict] }}>
