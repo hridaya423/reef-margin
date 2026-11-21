@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { getLocal, getTelemetry, type Category, type Local, type Pressure, type PressureKind, type Telemetry } from "./local";
+import { getLocal, getTelemetry, inRange, type Category, type Local, type Pressure, type PressureKind, type Telemetry } from "./local";
 
 type Tab = "species" | "animals" | "land";
 type Load<T> = { state: "loading" } | { state: "ready"; data: T };
@@ -69,7 +69,7 @@ export function Around({ i, lat, lon }: { i: number; lat: number; lon: number })
         ))}
       </div>
       <div role="tabpanel" id={`pane-${tab}`} aria-labelledby={`tab-${tab}`} className="pane">
-        {tab === "species" && <Species local={local} />}
+        {tab === "species" && <Species local={local} lon={lon} />}
         {tab === "animals" && <Animals tele={tele} />}
         {tab === "land" && <LandCoast local={local} />}
       </div>
@@ -81,8 +81,10 @@ function Wait() {
   return <div className="skel" style={{ height: 96 }} aria-busy="true" />;
 }
 
-function Species({ local }: { local: Load<Local> }) {
-  const list = local.state === "ready" ? local.data.redlist : undefined;
+function Species({ local, lon }: { local: Load<Local>; lon: number }) {
+  const raw = local.state === "ready" ? local.data.redlist : undefined;
+  const list = useMemo(() => raw && inRange(raw, lon), [raw, lon]);
+  const hidden = raw && list ? raw.length - list.length : 0;
   const summary = useMemo(() => {
     if (!list) return null;
     const byCat = new Map<Category, number>();
@@ -141,7 +143,10 @@ function Species({ local }: { local: Load<Local> }) {
           . Branching corals like these bleach first.
         </p>
       )}
-      <p className="fine">Occurrence records from OBIS (Ocean Biodiversity Information System) with IUCN Red List categories. A record means the species was seen here at some point, not that it lives here now.</p>
+      <p className="fine">
+        Occurrence records from OBIS (Ocean Biodiversity Information System) with IUCN Red List categories. A record means the species was seen here at some point, not that it lives here now.
+        {hidden > 0 && ` ${hidden} Atlantic-only coral ${hidden === 1 ? "record is" : "records are"} hidden as likely misidentifications.`}
+      </p>
     </>
   );
 }

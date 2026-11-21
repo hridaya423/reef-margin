@@ -1,0 +1,995 @@
+{
+ "reef": {
+  "i": 442,
+  "name": "Heron Island",
+  "lat": -23.44,
+  "lon": 151.91
+ },
+ "radius_km": 15.0,
+ "source": "IMOS Animal Tracking Facility, quality-controlled summarised acoustic detections (2007 - ongoing), AODN, CC BY 4.0",
+ "stations": [
+  {
+   "name": "HER 21",
+   "lat": -23.43,
+   "lon": 151.93,
+   "animals": 198,
+   "detections": 231055,
+   "first": "2010-09-11",
+   "last": "2025-06-02"
+  },
+  {
+   "name": "HER 19",
+   "lat": -23.44,
+   "lon": 151.9,
+   "animals": 160,
+   "detections": 104887,
+   "first": "2010-09-11",
+   "last": "2025-06-02"
+  },
+  {
+   "name": "HER 18",
+   "lat": -23.45,
+   "lon": 151.91,
+   "animals": 154,
+   "detections": 72751,
+   "first": "2010-09-12",
+   "last": "2025-05-31"
+  },
+  {
+   "name": "HER 24",
+   "lat": -23.44,
+   "lon": 151.98,
+   "animals": 142,
+   "detections": 421422,
+   "first": "2011-02-20",
+   "last": "2025-06-02"
+  },
+  {
+   "name": "Heron E1",
+   "lat": -23.44,
+   "lon": 152.0,
+   "animals": 140,
+   "detections": 104326,
+   "first": "2011-08-14",
+   "last": "2025-06-01"
+  },
+  {
+   "name": "NE Heron",
+   "lat": -23.43,
+   "lon": 151.94,
+   "animals": 137,
+   "detections": 224463,
+   "first": "2011-08-15",
+   "last": "2020-07-01"
+  },
+  {
+   "name": "HER 15",
+   "lat": -23.47,
+   "lon": 151.95,
+   "animals": 120,
+   "detections": 38568,
+   "first": "2011-02-20",
+   "last": "2025-06-08"
+  },
+  {
+   "name": "HER 22",
+   "lat": -23.43,
+   "lon": 151.95,
+   "animals": 110,
+   "detections": 241415,
+   "first": "2011-02-20",
+   "last": "2019-10-16"
+  },
+  {
+   "name": "S Heron",
+   "lat": -23.47,
+   "lon": 151.98,
+   "animals": 108,
+   "detections": 12171,
+   "first": "2011-08-19",
+   "last": "2025-06-07"
+  },
+  {
+   "name": "NW Heron",
+   "lat": -23.43,
+   "lon": 151.92,
+   "animals": 106,
+   "detections": 25374,
+   "first": "2011-08-17",
+   "last": "2020-12-23"
+  },
+  {
+   "name": "HER 17",
+   "lat": -23.45,
+   "lon": 151.92,
+   "animals": 105,
+   "detections": 587148,
+   "first": "2011-02-21",
+   "last": "2020-06-12"
+  },
+  {
+   "name": "HER 23",
+   "lat": -23.44,
+   "lon": 151.97,
+   "animals": 102,
+   "detections": 332160,
+   "first": "2011-02-20",
+   "last": "2021-01-09"
+  },
+  {
+   "name": "HER 20",
+   "lat": -23.43,
+   "lon": 151.9,
+   "animals": 99,
+   "detections": 154170,
+   "first": "2011-02-20",
+   "last": "2017-08-13"
+  },
+  {
+   "name": "HER 16",
+   "lat": -23.47,
+   "lon": 151.93,
+   "animals": 94,
+   "detections": 38561,
+   "first": "2011-02-21",
+   "last": "2020-07-29"
+  },
+  {
+   "name": "HER 11",
+   "lat": -23.43,
+   "lon": 152.0,
+   "animals": 87,
+   "detections": 21804,
+   "first": "2011-02-20",
+   "last": "2018-07-12"
+  },
+  {
+   "name": "HER 14",
+   "lat": -23.47,
+   "lon": 151.97,
+   "animals": 83,
+   "detections": 32945,
+   "first": "2011-02-20",
+   "last": "2020-12-23"
+  },
+  {
+   "name": "HER 12",
+   "lat": -23.45,
+   "lon": 152.0,
+   "animals": 67,
+   "detections": 23395,
+   "first": "2011-03-18",
+   "last": "2019-05-29"
+  },
+  {
+   "name": "HER 13",
+   "lat": -23.47,
+   "lon": 151.99,
+   "animals": 54,
+   "detections": 10755,
+   "first": "2011-02-20",
+   "last": "2020-06-12"
+  },
+  {
+   "name": "Heron E2",
+   "lat": -23.46,
+   "lon": 152.0,
+   "animals": 50,
+   "detections": 3693,
+   "first": "2011-08-14",
+   "last": "2019-10-19"
+  },
+  {
+   "name": "VP5",
+   "lat": -23.43,
+   "lon": 151.94,
+   "animals": 41,
+   "detections": 59722,
+   "first": "2014-03-22",
+   "last": "2014-06-29"
+  },
+  {
+   "name": "VP1",
+   "lat": -23.43,
+   "lon": 151.93,
+   "animals": 40,
+   "detections": 63742,
+   "first": "2014-03-22",
+   "last": "2014-06-30"
+  },
+  {
+   "name": "S4",
+   "lat": -23.4517,
+   "lon": 152.0234,
+   "animals": 39,
+   "detections": 4038,
+   "first": "2011-08-16",
+   "last": "2014-07-30"
+  },
+  {
+   "name": "VP9",
+   "lat": -23.43,
+   "lon": 151.94,
+   "animals": 37,
+   "detections": 27340,
+   "first": "2014-03-23",
+   "last": "2014-06-29"
+  },
+  {
+   "name": "VP7",
+   "lat": -23.43,
+   "lon": 151.94,
+   "animals": 37,
+   "detections": 46101,
+   "first": "2014-03-22",
+   "last": "2014-06-29"
+  },
+  {
+   "name": "VP4",
+   "lat": -23.43,
+   "lon": 151.93,
+   "animals": 36,
+   "detections": 35800,
+   "first": "2014-03-22",
+   "last": "2014-07-01"
+  },
+  {
+   "name": "VP6",
+   "lat": -23.44,
+   "lon": 151.94,
+   "animals": 36,
+   "detections": 38247,
+   "first": "2014-03-23",
+   "last": "2014-07-01"
+  },
+  {
+   "name": "VP8",
+   "lat": -23.44,
+   "lon": 151.94,
+   "animals": 36,
+   "detections": 33737,
+   "first": "2014-03-23",
+   "last": "2014-07-01"
+  },
+  {
+   "name": "VP0",
+   "lat": -23.43,
+   "lon": 151.94,
+   "animals": 36,
+   "detections": 8303,
+   "first": "2014-03-23",
+   "last": "2014-07-01"
+  },
+  {
+   "name": "VP3",
+   "lat": -23.43,
+   "lon": 151.93,
+   "animals": 36,
+   "detections": 23320,
+   "first": "2014-03-22",
+   "last": "2014-06-29"
+  },
+  {
+   "name": "S5",
+   "lat": -23.42,
+   "lon": 152.03,
+   "animals": 35,
+   "detections": 982,
+   "first": "2011-08-16",
+   "last": "2014-07-29"
+  },
+  {
+   "name": "HER 27",
+   "lat": -23.44,
+   "lon": 151.95,
+   "animals": 35,
+   "detections": 11888,
+   "first": "2011-05-03",
+   "last": "2016-10-08"
+  },
+  {
+   "name": "VP2",
+   "lat": -23.43,
+   "lon": 151.93,
+   "animals": 34,
+   "detections": 29392,
+   "first": "2014-03-22",
+   "last": "2014-07-01"
+  },
+  {
+   "name": "HER 29",
+   "lat": -23.45,
+   "lon": 151.98,
+   "animals": 32,
+   "detections": 24638,
+   "first": "2011-07-27",
+   "last": "2015-12-05"
+  },
+  {
+   "name": "HER 25",
+   "lat": -23.44,
+   "lon": 151.92,
+   "animals": 31,
+   "detections": 7342,
+   "first": "2011-03-22",
+   "last": "2017-04-17"
+  },
+  {
+   "name": "HFL05",
+   "lat": -23.45,
+   "lon": 151.91,
+   "animals": 31,
+   "detections": 3255,
+   "first": "2014-05-13",
+   "last": "2016-02-10"
+  },
+  {
+   "name": "HFL06",
+   "lat": -23.44,
+   "lon": 151.92,
+   "animals": 30,
+   "detections": 95285,
+   "first": "2014-05-13",
+   "last": "2016-02-09"
+  },
+  {
+   "name": "HER 30",
+   "lat": -23.46,
+   "lon": 151.96,
+   "animals": 30,
+   "detections": 20930,
+   "first": "2011-07-27",
+   "last": "2015-12-11"
+  },
+  {
+   "name": "HER 26",
+   "lat": -23.45,
+   "lon": 151.93,
+   "animals": 29,
+   "detections": 5415,
+   "first": "2011-03-25",
+   "last": "2017-03-05"
+  },
+  {
+   "name": "HER 28",
+   "lat": -23.45,
+   "lon": 151.97,
+   "animals": 29,
+   "detections": 11460,
+   "first": "2011-05-14",
+   "last": "2015-12-06"
+  },
+  {
+   "name": "HFL10",
+   "lat": -23.45,
+   "lon": 151.92,
+   "animals": 29,
+   "detections": 22238,
+   "first": "2014-05-13",
+   "last": "2016-02-09"
+  },
+  {
+   "name": "HFL03",
+   "lat": -23.44,
+   "lon": 151.92,
+   "animals": 28,
+   "detections": 30907,
+   "first": "2014-05-13",
+   "last": "2016-02-09"
+  },
+  {
+   "name": "HFL08",
+   "lat": -23.45,
+   "lon": 151.92,
+   "animals": 28,
+   "detections": 8984,
+   "first": "2014-05-13",
+   "last": "2016-02-06"
+  },
+  {
+   "name": "HFL07",
+   "lat": -23.45,
+   "lon": 151.92,
+   "animals": 28,
+   "detections": 2361,
+   "first": "2014-05-13",
+   "last": "2016-02-05"
+  },
+  {
+   "name": "HFL09",
+   "lat": -23.45,
+   "lon": 151.92,
+   "animals": 28,
+   "detections": 7962,
+   "first": "2014-05-13",
+   "last": "2016-02-03"
+  },
+  {
+   "name": "HFL01",
+   "lat": -23.44,
+   "lon": 151.91,
+   "animals": 27,
+   "detections": 40269,
+   "first": "2014-05-13",
+   "last": "2016-02-09"
+  },
+  {
+   "name": "HFL02",
+   "lat": -23.45,
+   "lon": 151.91,
+   "animals": 24,
+   "detections": 1614,
+   "first": "2014-05-15",
+   "last": "2016-02-06"
+  },
+  {
+   "name": "HFL04",
+   "lat": -23.45,
+   "lon": 151.91,
+   "animals": 24,
+   "detections": 943,
+   "first": "2014-05-13",
+   "last": "2016-02-03"
+  },
+  {
+   "name": "S2",
+   "lat": -23.44,
+   "lon": 152.04,
+   "animals": 22,
+   "detections": 406,
+   "first": "2011-08-22",
+   "last": "2014-07-29"
+  },
+  {
+   "name": "S3",
+   "lat": -23.46,
+   "lon": 152.04,
+   "animals": 20,
+   "detections": 239,
+   "first": "2011-08-23",
+   "last": "2014-07-27"
+  },
+  {
+   "name": "VP12",
+   "lat": -23.43,
+   "lon": 151.94,
+   "animals": 15,
+   "detections": 4543,
+   "first": "2014-06-24",
+   "last": "2014-06-30"
+  },
+  {
+   "name": "VP13",
+   "lat": -23.43,
+   "lon": 151.94,
+   "animals": 14,
+   "detections": 4544,
+   "first": "2014-06-24",
+   "last": "2014-06-30"
+  },
+  {
+   "name": "VP11",
+   "lat": -23.43,
+   "lon": 151.93,
+   "animals": 11,
+   "detections": 2883,
+   "first": "2014-06-23",
+   "last": "2014-06-30"
+  },
+  {
+   "name": "VP14",
+   "lat": -23.43,
+   "lon": 151.94,
+   "animals": 7,
+   "detections": 33,
+   "first": "2014-06-24",
+   "last": "2014-06-24"
+  }
+ ],
+ "species": [
+  {
+   "common": "Common Coral Trout",
+   "scientific": "Plectropomus leopardus",
+   "animals": 68,
+   "days": 1563,
+   "first": "2011-02-20",
+   "last": "2016-03-20"
+  },
+  {
+   "common": "Bull Shark",
+   "scientific": "Carcharhinus leucas",
+   "animals": 68,
+   "days": 222,
+   "first": "2011-03-11",
+   "last": "2025-06-03"
+  },
+  {
+   "common": "Tiger Shark",
+   "scientific": "Galeocerdo cuvier",
+   "animals": 60,
+   "days": 2021,
+   "first": "2011-08-08",
+   "last": "2025-06-08"
+  },
+  {
+   "common": "Redthroat Emperor",
+   "scientific": "Lethrinus miniatus",
+   "animals": 58,
+   "days": 1218,
+   "first": "2011-04-07",
+   "last": "2015-04-01"
+  },
+  {
+   "common": "Grey Reef Shark",
+   "scientific": "Carcharhinus amblyrhynchos",
+   "animals": 40,
+   "days": 2003,
+   "first": "2011-02-20",
+   "last": "2017-06-28"
+  },
+  {
+   "common": "Blacktip Reef Shark",
+   "scientific": "Carcharhinus melanopterus",
+   "animals": 30,
+   "days": 2276,
+   "first": "2011-03-20",
+   "last": "2017-06-26"
+  },
+  {
+   "common": "Spangled Emperor",
+   "scientific": "Lethrinus nebulosus",
+   "animals": 18,
+   "days": 800,
+   "first": "2013-03-14",
+   "last": "2016-01-23"
+  },
+  {
+   "common": "Manta Ray",
+   "scientific": "Mobula alfredi",
+   "animals": 18,
+   "days": 80,
+   "first": "2010-09-11",
+   "last": "2017-08-25"
+  },
+  {
+   "common": "Red Emperor",
+   "scientific": "Lutjanus sebae",
+   "animals": 12,
+   "days": 98,
+   "first": "2011-08-03",
+   "last": "2013-07-25"
+  },
+  {
+   "common": "Weasel Shark",
+   "scientific": "Hemigaleus australiensis",
+   "animals": 6,
+   "days": 594,
+   "first": "2011-08-22",
+   "last": "2014-02-26"
+  },
+  {
+   "common": "Great Hammerhead",
+   "scientific": "Sphyrna mokarran",
+   "animals": 5,
+   "days": 867,
+   "first": "2012-02-11",
+   "last": "2025-05-25"
+  },
+  {
+   "common": "Whitetip Reef Shark",
+   "scientific": "Triaenodon obesus",
+   "animals": 4,
+   "days": 1458,
+   "first": "2011-03-20",
+   "last": "2017-07-26"
+  },
+  {
+   "common": "Zebra Shark",
+   "scientific": "Stegostoma tigrinum",
+   "animals": 3,
+   "days": 3,
+   "first": "2015-10-10",
+   "last": "2022-09-23"
+  },
+  {
+   "common": "[a whaler shark]",
+   "scientific": "Carcharhinus limbatus & Carcharhinus tilstoni",
+   "animals": 2,
+   "days": 5,
+   "first": "2023-08-02",
+   "last": "2025-01-29"
+  },
+  {
+   "common": "Sandbar Shark",
+   "scientific": "Carcharhinus plumbeus",
+   "animals": 2,
+   "days": 2,
+   "first": "2024-12-21",
+   "last": "2025-02-28"
+  },
+  {
+   "common": "Pigeye Shark",
+   "scientific": "Carcharhinus amboinensis",
+   "animals": 1,
+   "days": 2,
+   "first": "2024-07-21",
+   "last": "2024-08-14"
+  },
+  {
+   "common": "Lemon Shark",
+   "scientific": "Negaprion acutidens",
+   "animals": 1,
+   "days": 1,
+   "first": "2024-08-24",
+   "last": "2024-08-24"
+  }
+ ],
+ "links": [
+  {
+   "station": "OT 1",
+   "lat": -23.51,
+   "lon": 152.04,
+   "km": 15,
+   "animals": 63,
+   "species": [
+    "Blacktip Reef Shark",
+    "Bull Shark",
+    "Common Coral Trout",
+    "Great Hammerhead",
+    "Grey Reef Shark",
+    "Lemon Shark",
+    "Manta Ray",
+    "Tiger Shark",
+    "Weasel Shark"
+   ]
+  },
+  {
+   "station": "OT 7",
+   "lat": -23.51,
+   "lon": 152.06,
+   "km": 17,
+   "animals": 60,
+   "species": [
+    "Blacktip Reef Shark",
+    "Bull Shark",
+    "Common Coral Trout",
+    "Great Hammerhead",
+    "Grey Reef Shark",
+    "Tiger Shark",
+    "Weasel Shark"
+   ]
+  },
+  {
+   "station": "VPS4_NWI",
+   "lat": -23.29,
+   "lon": 151.69,
+   "km": 28,
+   "animals": 58,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Green Zone",
+   "lat": -23.32,
+   "lon": 151.71,
+   "km": 24,
+   "animals": 58,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Lemon Shark",
+    "Pigeye Shark",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "VPS5_NWI",
+   "lat": -23.29,
+   "lon": 151.7,
+   "km": 27,
+   "animals": 58,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "VPS7_NWI",
+   "lat": -23.29,
+   "lon": 151.69,
+   "km": 28,
+   "animals": 56,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "VPS6_NWI",
+   "lat": -23.29,
+   "lon": 151.7,
+   "km": 27,
+   "animals": 56,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "South 1",
+   "lat": -23.32,
+   "lon": 151.74,
+   "km": 22,
+   "animals": 55,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "OT 2",
+   "lat": -23.49,
+   "lon": 152.05,
+   "km": 15,
+   "animals": 55,
+   "species": [
+    "Blacktip Reef Shark",
+    "Bull Shark",
+    "Common Coral Trout",
+    "Great Hammerhead",
+    "Grey Reef Shark",
+    "Manta Ray",
+    "Tiger Shark",
+    "Weasel Shark",
+    "Zebra Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "VPS9_NWI",
+   "lat": -23.28,
+   "lon": 151.69,
+   "km": 29,
+   "animals": 55,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "VPS2_NWI",
+   "lat": -23.29,
+   "lon": 151.7,
+   "km": 27,
+   "animals": 54,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Mooring",
+   "lat": -23.28,
+   "lon": 151.72,
+   "km": 26,
+   "animals": 54,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "VPS1_NWI",
+   "lat": -23.29,
+   "lon": 151.7,
+   "km": 27,
+   "animals": 53,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "VPS3_NWI",
+   "lat": -23.29,
+   "lon": 151.7,
+   "km": 27,
+   "animals": 53,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "South fish tail",
+   "lat": -23.3,
+   "lon": 151.81,
+   "km": 19,
+   "animals": 49,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Pigeye Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "NWI_1",
+   "lat": -23.29,
+   "lon": 151.7,
+   "km": 27,
+   "animals": 48,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "NWI_2",
+   "lat": -23.29,
+   "lon": 151.69,
+   "km": 28,
+   "animals": 48,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "NWI_4",
+   "lat": -23.31,
+   "lon": 151.7,
+   "km": 26,
+   "animals": 48,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "NWI_3",
+   "lat": -23.29,
+   "lon": 151.69,
+   "km": 28,
+   "animals": 47,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "OT 3",
+   "lat": -23.48,
+   "lon": 152.08,
+   "km": 18,
+   "animals": 46,
+   "species": [
+    "Blacktip Reef Shark",
+    "Bull Shark",
+    "Common Coral Trout",
+    "Great Hammerhead",
+    "Grey Reef Shark",
+    "Manta Ray",
+    "Tiger Shark",
+    "Weasel Shark"
+   ]
+  },
+  {
+   "station": "Half way",
+   "lat": -23.28,
+   "lon": 151.75,
+   "km": 24,
+   "animals": 45,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Lemon Shark",
+    "Pigeye Shark",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "NWI_6",
+   "lat": -23.32,
+   "lon": 151.7,
+   "km": 25,
+   "animals": 44,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Heavy fished",
+   "lat": -23.27,
+   "lon": 151.84,
+   "km": 20,
+   "animals": 44,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "North_fish_tail",
+   "lat": -23.28,
+   "lon": 151.8,
+   "km": 21,
+   "animals": 40,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "NWI_5",
+   "lat": -23.32,
+   "lon": 151.7,
+   "km": 25,
+   "animals": 38,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  }
+ ]
+}

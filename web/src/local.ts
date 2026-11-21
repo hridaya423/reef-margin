@@ -81,6 +81,17 @@ function groupOf(t: Record<string, string | undefined>): string {
   return "Other";
 }
 
+// Coral genera (and three species) found only in the Atlantic. On an Indo-Pacific reef such a record is
+// almost certainly a misidentification, e.g. Agaricia humilis and Orbicella annularis at Orpheus Island.
+const ATLANTIC_CORALS =
+  /^(Agaricia|Colpophyllia|Dendrogyra|Dichocoenia|Diploria|Eusmilia|Helioseris|Isophyllia|Manicina|Meandrina|Montastraea|Mussa|Mycetophyllia|Orbicella|Pseudodiploria|Solenastrea|Undaria)\b|^(Acropora palmata|Acropora cervicornis|Porites astreoides)$/;
+
+/** Drops Atlantic-only corals from Indo-West Pacific reefs (30°E eastward to 120°W). */
+export function inRange(list: RedSpecies[], lon: number): RedSpecies[] {
+  const indoPacific = lon >= 30 || lon <= -120;
+  return indoPacific ? list.filter((s) => !(s.group === "Corals" && ATLANTIC_CORALS.test(s.name))) : list;
+}
+
 function box(lat: number, lon: number, km: number) {
   const dLat = km / 111.32;
   const dLon = km / (111.32 * Math.cos((lat * Math.PI) / 180));

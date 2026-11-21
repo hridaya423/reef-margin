@@ -1,0 +1,349 @@
+{
+ "reef": {
+  "i": 4313,
+  "name": "Lizard Island",
+  "lat": -14.67,
+  "lon": 145.45
+ },
+ "radius_km": 15.0,
+ "source": "IMOS Animal Tracking Facility, quality-controlled summarised acoustic detections (2007 - ongoing), AODN, CC BY 4.0",
+ "stations": [
+  {
+   "name": "TB2",
+   "lat": -14.6501,
+   "lon": 145.45,
+   "animals": 19,
+   "detections": 125899,
+   "first": "2015-10-09",
+   "last": "2016-03-24"
+  },
+  {
+   "name": "TB1",
+   "lat": -14.68,
+   "lon": 145.45,
+   "animals": 16,
+   "detections": 40054,
+   "first": "2015-10-09",
+   "last": "2015-12-18"
+  },
+  {
+   "name": "PALFREY_3",
+   "lat": -14.69,
+   "lon": 145.44,
+   "animals": 13,
+   "detections": 62841,
+   "first": "2015-10-10",
+   "last": "2016-04-10"
+  },
+  {
+   "name": "TB4",
+   "lat": -14.65,
+   "lon": 145.45,
+   "animals": 13,
+   "detections": 30831,
+   "first": "2015-10-09",
+   "last": "2016-01-24"
+  },
+  {
+   "name": "PALFREY_4",
+   "lat": -14.69,
+   "lon": 145.44,
+   "animals": 13,
+   "detections": 181421,
+   "first": "2015-10-10",
+   "last": "2016-04-10"
+  },
+  {
+   "name": "SOUTH_3",
+   "lat": -14.65,
+   "lon": 145.45,
+   "animals": 11,
+   "detections": 151339,
+   "first": "2015-12-19",
+   "last": "2016-04-10"
+  },
+  {
+   "name": "SOUTH_2",
+   "lat": -14.68,
+   "lon": 145.45,
+   "animals": 10,
+   "detections": 131373,
+   "first": "2015-12-19",
+   "last": "2016-04-10"
+  },
+  {
+   "name": "NORTH_2",
+   "lat": -14.65,
+   "lon": 145.45,
+   "animals": 2,
+   "detections": 24,
+   "first": "2015-11-03",
+   "last": "2016-01-22"
+  },
+  {
+   "name": "Lizard Island",
+   "lat": -14.69,
+   "lon": 145.47,
+   "animals": 2,
+   "detections": 2,
+   "first": "2021-03-27",
+   "last": "2022-07-16"
+  },
+  {
+   "name": "NORTH REEF_1",
+   "lat": -14.65,
+   "lon": 145.45,
+   "animals": 2,
+   "detections": 9,
+   "first": "2015-11-03",
+   "last": "2016-01-22"
+  },
+  {
+   "name": "PALFREY_6",
+   "lat": -14.69,
+   "lon": 145.44,
+   "animals": 1,
+   "detections": 1,
+   "first": "2015-12-16",
+   "last": "2015-12-16"
+  }
+ ],
+ "species": [
+  {
+   "common": "Bluelined Rabbitfish",
+   "scientific": "Siganus doliatus",
+   "animals": 29,
+   "days": 185,
+   "first": "2015-10-09",
+   "last": "2016-04-10"
+  },
+  {
+   "common": "Tiger Shark",
+   "scientific": "Galeocerdo cuvier",
+   "animals": 1,
+   "days": 1,
+   "first": "2021-03-27",
+   "last": "2021-03-27"
+  },
+  {
+   "common": "Bull Shark",
+   "scientific": "Carcharhinus leucas",
+   "animals": 1,
+   "days": 1,
+   "first": "2022-07-16",
+   "last": "2022-07-16"
+  }
+ ],
+ "links": [
+  {
+   "station": "NSW DPI Byron Bay FAD",
+   "lat": -28.61,
+   "lon": 153.71,
+   "km": 1768,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "Batt-Tongue Channel",
+   "lat": -16.38,
+   "lon": 145.81,
+   "km": 194,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "SI 3",
+   "lat": -27.42,
+   "lon": 153.56,
+   "km": 1647,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "Dunk Island MMP",
+   "lat": -17.93,
+   "lon": 146.15,
+   "km": 370,
+   "animals": 1,
+   "species": [
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "Batt Reef (South)",
+   "lat": -16.44,
+   "lon": 145.86,
+   "km": 202,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "Saxon Reef",
+   "lat": -16.46,
+   "lon": 145.98,
+   "km": 207,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "AIMS Special Management 1",
+   "lat": -19.28,
+   "lon": 147.06,
+   "km": 540,
+   "animals": 1,
+   "species": [
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "SI 4",
+   "lat": -27.42,
+   "lon": 153.57,
+   "km": 1648,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "Flynn Reef",
+   "lat": -16.73,
+   "lon": 146.27,
+   "km": 245,
+   "animals": 1,
+   "species": [
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "SI 6",
+   "lat": -27.42,
+   "lon": 153.58,
+   "km": 1648,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "FAD1",
+   "lat": -27.99,
+   "lon": 153.53,
+   "km": 1700,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "SI 5",
+   "lat": -27.42,
+   "lon": 153.58,
+   "km": 1648,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "North Barnard Island MMP",
+   "lat": -17.67,
+   "lon": 146.17,
+   "km": 342,
+   "animals": 1,
+   "species": [
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "NW corner of Hutchisons - South Qld",
+   "lat": -26.94,
+   "lon": 153.49,
+   "km": 1599,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "FAD7",
+   "lat": -26.6,
+   "lon": 153.33,
+   "km": 1558,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "Normandy (Franklin Group)",
+   "lat": -17.2,
+   "lon": 146.07,
+   "km": 289,
+   "animals": 1,
+   "species": [
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "NSW DPI Evans Head FAD",
+   "lat": -29.11,
+   "lon": 153.6,
+   "km": 1811,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "FAD12B",
+   "lat": -27.92,
+   "lon": 153.63,
+   "km": 1698,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "NSW DPI Ballina FAD",
+   "lat": -28.91,
+   "lon": 153.69,
+   "km": 1796,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "Russell Island (Franklands West) MMP",
+   "lat": -17.23,
+   "lon": 146.09,
+   "km": 293,
+   "animals": 1,
+   "species": [
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "SEQ 29s",
+   "lat": -27.3,
+   "lon": 153.51,
+   "km": 1633,
+   "animals": 1,
+   "species": [
+    "Bull Shark"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,1269 @@
+{
+ "reef": {
+  "i": 2342,
+  "name": "Orpheus Island",
+  "lat": -18.61,
+  "lon": 146.49
+ },
+ "radius_km": 15.0,
+ "source": "IMOS Animal Tracking Facility, quality-controlled summarised acoustic detections (2007 - ongoing), AODN, CC BY 4.0",
+ "stations": [
+  {
+   "name": "ORPH 10",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 101,
+   "detections": 432690,
+   "first": "2010-12-07",
+   "last": "2015-10-05"
+  },
+  {
+   "name": "ORPH 11",
+   "lat": -18.6,
+   "lon": 146.49,
+   "animals": 72,
+   "detections": 289627,
+   "first": "2010-12-07",
+   "last": "2015-09-08"
+  },
+  {
+   "name": "l1",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 71,
+   "detections": 177562,
+   "first": "2010-12-19",
+   "last": "2014-01-28"
+  },
+  {
+   "name": "Orph 21",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 70,
+   "detections": 340998,
+   "first": "2012-01-22",
+   "last": "2015-10-04"
+  },
+  {
+   "name": "Orph 22",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 68,
+   "detections": 169662,
+   "first": "2012-01-22",
+   "last": "2015-09-30"
+  },
+  {
+   "name": "Orph 20",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 66,
+   "detections": 164179,
+   "first": "2012-01-22",
+   "last": "2015-10-02"
+  },
+  {
+   "name": "ORPH 15",
+   "lat": -18.58,
+   "lon": 146.48,
+   "animals": 62,
+   "detections": 114742,
+   "first": "2010-12-10",
+   "last": "2014-09-10"
+  },
+  {
+   "name": "ORPH 14",
+   "lat": -18.58,
+   "lon": 146.48,
+   "animals": 61,
+   "detections": 371829,
+   "first": "2010-12-11",
+   "last": "2015-10-01"
+  },
+  {
+   "name": "ORPH 12",
+   "lat": -18.6,
+   "lon": 146.49,
+   "animals": 58,
+   "detections": 185120,
+   "first": "2010-12-08",
+   "last": "2015-08-22"
+  },
+  {
+   "name": "Orph 23",
+   "lat": -18.61,
+   "lon": 146.4802,
+   "animals": 58,
+   "detections": 64942,
+   "first": "2012-01-22",
+   "last": "2015-03-17"
+  },
+  {
+   "name": "Pelorus Island MMP",
+   "lat": -18.54,
+   "lon": 146.49,
+   "animals": 55,
+   "detections": 1668,
+   "first": "2021-06-29",
+   "last": "2026-02-25"
+  },
+  {
+   "name": "Orph 19",
+   "lat": -18.6,
+   "lon": 146.49,
+   "animals": 55,
+   "detections": 141341,
+   "first": "2012-01-22",
+   "last": "2015-10-02"
+  },
+  {
+   "name": "ORPH 13",
+   "lat": -18.59,
+   "lon": 146.48,
+   "animals": 54,
+   "detections": 80831,
+   "first": "2010-12-09",
+   "last": "2015-05-20"
+  },
+  {
+   "name": "l2",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 54,
+   "detections": 156771,
+   "first": "2012-03-23",
+   "last": "2015-09-30"
+  },
+  {
+   "name": "ORPH 9",
+   "lat": -18.61,
+   "lon": 146.48,
+   "animals": 53,
+   "detections": 109493,
+   "first": "2010-12-09",
+   "last": "2018-08-12"
+  },
+  {
+   "name": "Orpheus - Fantome Pass",
+   "lat": -18.6572,
+   "lon": 146.51,
+   "animals": 52,
+   "detections": 41225,
+   "first": "2021-08-27",
+   "last": "2025-07-23"
+  },
+  {
+   "name": "Hazard Bay Deep",
+   "lat": -18.64,
+   "lon": 146.48,
+   "animals": 47,
+   "detections": 6073,
+   "first": "2024-08-02",
+   "last": "2025-09-29"
+  },
+  {
+   "name": "Pioneer Bay 15",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 45,
+   "detections": 11752,
+   "first": "2011-11-19",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 7",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 43,
+   "detections": 37969,
+   "first": "2011-11-19",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 3",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 43,
+   "detections": 16673,
+   "first": "2011-11-19",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 11",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 42,
+   "detections": 12355,
+   "first": "2011-11-19",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "ORPH 1",
+   "lat": -18.57,
+   "lon": 146.48,
+   "animals": 42,
+   "detections": 30731,
+   "first": "2010-12-08",
+   "last": "2015-10-01"
+  },
+  {
+   "name": "Pioneer Bay 4",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 42,
+   "detections": 13791,
+   "first": "2011-11-19",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 8",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 42,
+   "detections": 15798,
+   "first": "2011-11-19",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 5",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 41,
+   "detections": 30298,
+   "first": "2011-11-19",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 25",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 41,
+   "detections": 24275,
+   "first": "2011-11-20",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 14",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 41,
+   "detections": 20206,
+   "first": "2011-11-20",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 20",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 41,
+   "detections": 20058,
+   "first": "2011-11-20",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 6",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 41,
+   "detections": 20410,
+   "first": "2011-11-19",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "ORPH 8",
+   "lat": -18.62,
+   "lon": 146.49,
+   "animals": 40,
+   "detections": 70205,
+   "first": "2010-12-08",
+   "last": "2015-05-29"
+  },
+  {
+   "name": "pioneer Bay 10",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 40,
+   "detections": 23856,
+   "first": "2011-11-20",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 16",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 39,
+   "detections": 14323,
+   "first": "2011-11-20",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 18",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 37,
+   "detections": 15529,
+   "first": "2011-11-20",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 2",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 37,
+   "detections": 12639,
+   "first": "2011-11-20",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 13",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 36,
+   "detections": 12389,
+   "first": "2011-11-19",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 21",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 36,
+   "detections": 14423,
+   "first": "2011-11-20",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 17",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 36,
+   "detections": 15730,
+   "first": "2011-11-20",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 24",
+   "lat": -18.6,
+   "lon": 146.49,
+   "animals": 35,
+   "detections": 11175,
+   "first": "2011-11-20",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 23",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 35,
+   "detections": 16239,
+   "first": "2011-11-20",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 9",
+   "lat": -18.61,
+   "lon": 146.48,
+   "animals": 35,
+   "detections": 12039,
+   "first": "2011-11-19",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Pioneer Bay 19",
+   "lat": -18.6,
+   "lon": 146.49,
+   "animals": 34,
+   "detections": 13089,
+   "first": "2011-11-19",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "ORPH 2",
+   "lat": -18.57,
+   "lon": 146.49,
+   "animals": 34,
+   "detections": 64915,
+   "first": "2010-12-13",
+   "last": "2017-09-17"
+  },
+  {
+   "name": "l4",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 31,
+   "detections": 54324,
+   "first": "2012-12-14",
+   "last": "2013-08-21"
+  },
+  {
+   "name": "ORPH 7",
+   "lat": -18.65,
+   "lon": 146.49,
+   "animals": 31,
+   "detections": 129694,
+   "first": "2010-12-08",
+   "last": "2014-12-08"
+  },
+  {
+   "name": "Fantome Reef Flat",
+   "lat": -18.69,
+   "lon": 146.51,
+   "animals": 31,
+   "detections": 1208,
+   "first": "2024-05-26",
+   "last": "2025-09-25"
+  },
+  {
+   "name": "Lucinda Flat Offshore",
+   "lat": -18.56,
+   "lon": 146.38,
+   "animals": 31,
+   "detections": 18087,
+   "first": "2024-06-07",
+   "last": "2026-02-22"
+  },
+  {
+   "name": "Pioneer Bay 1",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 30,
+   "detections": 14117,
+   "first": "2011-11-20",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "Curacao South",
+   "lat": -18.68,
+   "lon": 146.55,
+   "animals": 30,
+   "detections": 3550,
+   "first": "2024-06-13",
+   "last": "2025-09-29"
+  },
+  {
+   "name": "Orph 17",
+   "lat": -18.64,
+   "lon": 146.49,
+   "animals": 29,
+   "detections": 45345,
+   "first": "2011-12-09",
+   "last": "2014-12-15"
+  },
+  {
+   "name": "Pioneer Bay 22",
+   "lat": -18.6,
+   "lon": 146.49,
+   "animals": 29,
+   "detections": 14714,
+   "first": "2011-11-20",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "l6",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 29,
+   "detections": 92553,
+   "first": "2012-12-14",
+   "last": "2013-08-21"
+  },
+  {
+   "name": "Pioneer Bay 12",
+   "lat": -18.61,
+   "lon": 146.48,
+   "animals": 29,
+   "detections": 6310,
+   "first": "2011-11-20",
+   "last": "2012-01-22"
+  },
+  {
+   "name": "l3",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 28,
+   "detections": 56367,
+   "first": "2012-12-14",
+   "last": "2013-08-21"
+  },
+  {
+   "name": "Gentle Annie Creek",
+   "lat": -18.58,
+   "lon": 146.36,
+   "animals": 28,
+   "detections": 19084,
+   "first": "2024-06-11",
+   "last": "2026-05-17"
+  },
+  {
+   "name": "l5",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 28,
+   "detections": 64645,
+   "first": "2012-12-14",
+   "last": "2013-08-21"
+  },
+  {
+   "name": "Orph 16",
+   "lat": -18.63,
+   "lon": 146.49,
+   "animals": 27,
+   "detections": 40845,
+   "first": "2011-12-07",
+   "last": "2015-03-07"
+  },
+  {
+   "name": "Cattle Bay S",
+   "lat": -18.58,
+   "lon": 146.48,
+   "animals": 26,
+   "detections": 215859,
+   "first": "2014-01-24",
+   "last": "2015-09-30"
+  },
+  {
+   "name": "ORPH 3",
+   "lat": -18.58,
+   "lon": 146.5,
+   "animals": 25,
+   "detections": 56984,
+   "first": "2011-09-23",
+   "last": "2014-03-27"
+  },
+  {
+   "name": "Lucinda Flat South",
+   "lat": -18.56,
+   "lon": 146.37,
+   "animals": 25,
+   "detections": 20443,
+   "first": "2024-06-03",
+   "last": "2026-05-17"
+  },
+  {
+   "name": "Taylors Beach Flat",
+   "lat": -18.62,
+   "lon": 146.36,
+   "animals": 25,
+   "detections": 4025,
+   "first": "2025-01-05",
+   "last": "2026-05-17"
+  },
+  {
+   "name": "ORPH 6",
+   "lat": -18.67,
+   "lon": 146.49,
+   "animals": 24,
+   "detections": 83062,
+   "first": "2010-12-08",
+   "last": "2014-12-08"
+  },
+  {
+   "name": "ORPH 5",
+   "lat": -18.66,
+   "lon": 146.5,
+   "animals": 23,
+   "detections": 4869,
+   "first": "2011-09-28",
+   "last": "2015-01-08"
+  },
+  {
+   "name": "ORPH P2",
+   "lat": -18.55,
+   "lon": 146.49,
+   "animals": 22,
+   "detections": 24339,
+   "first": "2010-12-09",
+   "last": "2017-09-17"
+  },
+  {
+   "name": "ORPH P1",
+   "lat": -18.56,
+   "lon": 146.49,
+   "animals": 22,
+   "detections": 21681,
+   "first": "2010-12-12",
+   "last": "2017-09-17"
+  },
+  {
+   "name": "Orph 18",
+   "lat": -18.67,
+   "lon": 146.49,
+   "animals": 21,
+   "detections": 22650,
+   "first": "2011-12-18",
+   "last": "2014-12-07"
+  },
+  {
+   "name": "Pioneer Bay",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 19,
+   "detections": 77424,
+   "first": "2014-01-24",
+   "last": "2015-04-17"
+  },
+  {
+   "name": "Hazard Bay Marker",
+   "lat": -18.63,
+   "lon": 146.49,
+   "animals": 17,
+   "detections": 260,
+   "first": "2024-05-31",
+   "last": "2025-09-27"
+  },
+  {
+   "name": "M2",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 16,
+   "detections": 7121,
+   "first": "2012-12-25",
+   "last": "2013-12-07"
+  },
+  {
+   "name": "M1",
+   "lat": -18.61,
+   "lon": 146.49,
+   "animals": 16,
+   "detections": 7652,
+   "first": "2012-12-25",
+   "last": "2013-08-21"
+  },
+  {
+   "name": "ORPH P3",
+   "lat": -18.56,
+   "lon": 146.5,
+   "animals": 14,
+   "detections": 13257,
+   "first": "2011-09-22",
+   "last": "2015-07-22"
+  },
+  {
+   "name": "Cattle Bay N",
+   "lat": -18.57,
+   "lon": 146.48,
+   "animals": 14,
+   "detections": 2542,
+   "first": "2014-01-24",
+   "last": "2015-09-30"
+  },
+  {
+   "name": "ORPH 4",
+   "lat": -18.6,
+   "lon": 146.5,
+   "animals": 13,
+   "detections": 4972,
+   "first": "2011-12-11",
+   "last": "2017-09-17"
+  },
+  {
+   "name": "ORPH F1",
+   "lat": -18.66,
+   "lon": 146.5,
+   "animals": 13,
+   "detections": 1234,
+   "first": "2010-12-21",
+   "last": "2014-09-01"
+  },
+  {
+   "name": "Little Pioneer Bay N",
+   "lat": -18.59,
+   "lon": 146.49,
+   "animals": 12,
+   "detections": 89224,
+   "first": "2014-01-24",
+   "last": "2015-10-05"
+  },
+  {
+   "name": "ORPH F2",
+   "lat": -18.66,
+   "lon": 146.5132,
+   "animals": 11,
+   "detections": 288,
+   "first": "2011-11-24",
+   "last": "2017-09-18"
+  },
+  {
+   "name": "Little Pioneer Bay Mid",
+   "lat": -18.6,
+   "lon": 146.49,
+   "animals": 11,
+   "detections": 15177,
+   "first": "2014-01-24",
+   "last": "2015-10-04"
+  },
+  {
+   "name": "Little Pioneer Bay S",
+   "lat": -18.6,
+   "lon": 146.49,
+   "animals": 8,
+   "detections": 22818,
+   "first": "2014-01-24",
+   "last": "2015-10-04"
+  },
+  {
+   "name": "Hazard Bay South Reef",
+   "lat": -18.64,
+   "lon": 146.49,
+   "animals": 7,
+   "detections": 14,
+   "first": "2024-08-30",
+   "last": "2025-03-29"
+  },
+  {
+   "name": "Lucinda Jetty Coastal Observatory",
+   "lat": -18.52,
+   "lon": 146.39,
+   "animals": 1,
+   "detections": 44,
+   "first": "2024-07-26",
+   "last": "2024-08-20"
+  }
+ ],
+ "species": [
+  {
+   "common": "Blacktip Reef Shark",
+   "scientific": "Carcharhinus melanopterus",
+   "animals": 56,
+   "days": 1764,
+   "first": "2010-12-07",
+   "last": "2015-10-05"
+  },
+  {
+   "common": "Bull Shark",
+   "scientific": "Carcharhinus leucas",
+   "animals": 34,
+   "days": 225,
+   "first": "2011-08-04",
+   "last": "2026-03-05"
+  },
+  {
+   "common": "Common Coral Trout",
+   "scientific": "Plectropomus leopardus",
+   "animals": 30,
+   "days": 632,
+   "first": "2013-09-05",
+   "last": "2015-05-29"
+  },
+  {
+   "common": "Tiger Shark",
+   "scientific": "Galeocerdo cuvier",
+   "animals": 28,
+   "days": 649,
+   "first": "2014-07-10",
+   "last": "2026-05-08"
+  },
+  {
+   "common": "Barcheek Coral Trout",
+   "scientific": "Plectropomus maculatus",
+   "animals": 27,
+   "days": 566,
+   "first": "2013-09-09",
+   "last": "2015-05-30"
+  },
+  {
+   "common": "Surf Parrotfish",
+   "scientific": "Scarus rivulatus",
+   "animals": 18,
+   "days": 591,
+   "first": "2011-04-22",
+   "last": "2012-12-02"
+  },
+  {
+   "common": "Scalloped Hammerhead",
+   "scientific": "Sphyrna lewini",
+   "animals": 17,
+   "days": 605,
+   "first": "2024-06-07",
+   "last": "2026-05-17"
+  },
+  {
+   "common": "Brassy Drummer",
+   "scientific": "Kyphosus vaigiensis",
+   "animals": 14,
+   "days": 529,
+   "first": "2011-09-19",
+   "last": "2013-03-20"
+  },
+  {
+   "common": "Great Hammerhead",
+   "scientific": "Sphyrna mokarran",
+   "animals": 11,
+   "days": 196,
+   "first": "2021-06-29",
+   "last": "2026-05-17"
+  },
+  {
+   "common": "[a whaler shark]",
+   "scientific": "Carcharhinus limbatus & Carcharhinus tilstoni",
+   "animals": 7,
+   "days": 579,
+   "first": "2014-09-01",
+   "last": "2026-04-05"
+  },
+  {
+   "common": "Spot-tail Shark",
+   "scientific": "Carcharhinus sorrah",
+   "animals": 5,
+   "days": 702,
+   "first": "2021-10-15",
+   "last": "2025-09-24"
+  },
+  {
+   "common": "Pigeye Shark",
+   "scientific": "Carcharhinus amboinensis",
+   "animals": 5,
+   "days": 356,
+   "first": "2013-09-13",
+   "last": "2026-04-30"
+  },
+  {
+   "common": "Giant Shovelnose Ray",
+   "scientific": "Glaucostegus typus",
+   "animals": 4,
+   "days": 369,
+   "first": "2011-12-28",
+   "last": "2026-05-17"
+  },
+  {
+   "common": "Lemon Shark",
+   "scientific": "Negaprion acutidens",
+   "animals": 3,
+   "days": 38,
+   "first": "2024-12-03",
+   "last": "2026-04-08"
+  },
+  {
+   "common": "Zebra Shark",
+   "scientific": "Stegostoma tigrinum",
+   "animals": 3,
+   "days": 11,
+   "first": "2013-09-26",
+   "last": "2025-08-05"
+  },
+  {
+   "common": "Grey Reef Shark",
+   "scientific": "Carcharhinus amblyrhynchos",
+   "animals": 2,
+   "days": 917,
+   "first": "2011-12-13",
+   "last": "2014-07-08"
+  },
+  {
+   "common": "Sandbar Shark",
+   "scientific": "Carcharhinus plumbeus",
+   "animals": 2,
+   "days": 77,
+   "first": "2021-07-31",
+   "last": "2025-07-22"
+  },
+  {
+   "common": "Whitespotted Guitarfish",
+   "scientific": "Rhynchobatus australiae",
+   "animals": 2,
+   "days": 34,
+   "first": "2024-10-26",
+   "last": "2024-12-16"
+  },
+  {
+   "common": "Spinner Shark",
+   "scientific": "Carcharhinus brevipinna",
+   "animals": 1,
+   "days": 127,
+   "first": "2022-04-25",
+   "last": "2025-09-26"
+  },
+  {
+   "common": "Australian Sharpnose Shark",
+   "scientific": "Rhizoprionodon taylori",
+   "animals": 1,
+   "days": 5,
+   "first": "2012-11-23",
+   "last": "2013-11-20"
+  },
+  {
+   "common": "Whitecheek Shark",
+   "scientific": "Carcharhinus coatesi",
+   "animals": 1,
+   "days": 3,
+   "first": "2022-08-30",
+   "last": "2025-08-03"
+  },
+  {
+   "common": "Mangrove Jack",
+   "scientific": "Lutjanus argentimaculatus",
+   "animals": 1,
+   "days": 2,
+   "first": "2012-03-28",
+   "last": "2012-03-29"
+  },
+  {
+   "common": "green turtle",
+   "scientific": "Chelonia mydas",
+   "animals": 1,
+   "days": 1,
+   "first": "2011-01-15",
+   "last": "2011-01-15"
+  },
+  {
+   "common": "Giant Trevally",
+   "scientific": "Caranx ignobilis",
+   "animals": 1,
+   "days": 1,
+   "first": "2015-01-08",
+   "last": "2015-01-08"
+  },
+  {
+   "common": "Common Blacktip Shark",
+   "scientific": "Carcharhinus limbatus",
+   "animals": 1,
+   "days": 1,
+   "first": "2015-03-04",
+   "last": "2015-03-04"
+  }
+ ],
+ "links": [
+  {
+   "station": "Lady Elliot Reef MMP",
+   "lat": -18.68,
+   "lon": 146.33,
+   "km": 19,
+   "animals": 32,
+   "species": [
+    "Bull Shark",
+    "Giant Shovelnose Ray",
+    "Great Hammerhead",
+    "Lemon Shark",
+    "Pigeye Shark",
+    "Scalloped Hammerhead",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Lucinda Flat North",
+   "lat": -18.54,
+   "lon": 146.36,
+   "km": 16,
+   "animals": 31,
+   "species": [
+    "Bull Shark",
+    "Giant Shovelnose Ray",
+    "Great Hammerhead",
+    "Pigeye Shark",
+    "Scalloped Hammerhead",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Pandora Reef MMP",
+   "lat": -18.82,
+   "lon": 146.43,
+   "km": 24,
+   "animals": 31,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Pigeye Shark",
+    "Scalloped Hammerhead",
+    "Spinner Shark",
+    "Spot-tail Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Brisk Channel",
+   "lat": -18.77,
+   "lon": 146.53,
+   "km": 18,
+   "animals": 25,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Pigeye Shark",
+    "Scalloped Hammerhead",
+    "Spinner Shark",
+    "Spot-tail Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Magnetic Island SCP",
+   "lat": -19.11,
+   "lon": 146.86,
+   "km": 68,
+   "animals": 18,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Pigeye Shark",
+    "Spot-tail Shark",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Brook Islands (Hinchinbrook)",
+   "lat": -18.14,
+   "lon": 146.28,
+   "km": 57,
+   "animals": 12,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Spot-tail Shark",
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "North Barnard Island MMP",
+   "lat": -17.67,
+   "lon": 146.17,
+   "km": 110,
+   "animals": 10,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "Haycock Island",
+   "lat": -18.47,
+   "lon": 146.21,
+   "km": 33,
+   "animals": 9,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Scalloped Hammerhead",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Snow's Corner",
+   "lat": -18.49,
+   "lon": 146.26,
+   "km": 28,
+   "animals": 9,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Lemon Shark",
+    "Scalloped Hammerhead",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Hinchinbrook Channel Entrance - Bluff",
+   "lat": -18.5,
+   "lon": 146.3,
+   "km": 23,
+   "animals": 9,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Lemon Shark",
+    "Scalloped Hammerhead",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Brewer 1",
+   "lat": -18.64,
+   "lon": 147.02,
+   "km": 56,
+   "animals": 8,
+   "species": [
+    "Bull Shark",
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "Jewfish site (Hinchinbrook)",
+   "lat": -18.29,
+   "lon": 146.0899,
+   "km": 55,
+   "animals": 8,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Pigeye Shark",
+    "Scalloped Hammerhead",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Bowling Green Bay - Giru",
+   "lat": -19.32,
+   "lon": 147.35,
+   "km": 120,
+   "animals": 8,
+   "species": [
+    "Bull Shark",
+    "Scalloped Hammerhead",
+    "Spot-tail Shark",
+    "Tiger Shark",
+    "Whitecheek Shark"
+   ]
+  },
+  {
+   "station": "Forrest Beach Deep",
+   "lat": -18.75,
+   "lon": 146.32,
+   "km": 24,
+   "animals": 8,
+   "species": [
+    "Bull Shark",
+    "Giant Shovelnose Ray",
+    "Great Hammerhead",
+    "Scalloped Hammerhead",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Dunk Island MMP",
+   "lat": -17.93,
+   "lon": 146.15,
+   "km": 84,
+   "animals": 8,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "Rib 1",
+   "lat": -18.48,
+   "lon": 146.86,
+   "km": 42,
+   "animals": 8,
+   "species": [
+    "Blacktip Reef Shark",
+    "Bull Shark",
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "Seymour River Hole",
+   "lat": -18.49,
+   "lon": 146.24,
+   "km": 30,
+   "animals": 8,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Scalloped Hammerhead",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Mackerel Bay",
+   "lat": -20.07,
+   "lon": 148.96,
+   "km": 306,
+   "animals": 8,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Spinner Shark",
+    "Spot-tail Shark",
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "Woody/Lowe Isles (Port Douglas)",
+   "lat": -16.38,
+   "lon": 145.56,
+   "km": 267,
+   "animals": 8,
+   "species": [
+    "Bull Shark",
+    "Scalloped Hammerhead",
+    "Tiger Shark",
+    "Whitecheek Shark"
+   ]
+  },
+  {
+   "station": "Fitzroy Island",
+   "lat": -16.92,
+   "lon": 145.99,
+   "km": 195,
+   "animals": 7,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Tiger Shark",
+    "Whitecheek Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Batt-Tongue Channel",
+   "lat": -16.38,
+   "lon": 145.81,
+   "km": 258,
+   "animals": 7,
+   "species": [
+    "Bull Shark",
+    "Great Hammerhead",
+    "Tiger Shark",
+    "[a whaler shark]"
+   ]
+  },
+  {
+   "station": "Rib 2",
+   "lat": -18.48,
+   "lon": 146.89,
+   "km": 45,
+   "animals": 7,
+   "species": [
+    "Bull Shark",
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "Lodestone 2",
+   "lat": -18.7,
+   "lon": 147.09,
+   "km": 64,
+   "animals": 7,
+   "species": [
+    "Bull Shark",
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "Grub 2",
+   "lat": -18.65,
+   "lon": 147.39,
+   "km": 95,
+   "animals": 7,
+   "species": [
+    "Bull Shark"
+   ]
+  },
+  {
+   "station": "Rib 3",
+   "lat": -18.47,
+   "lon": 146.88,
+   "km": 44,
+   "animals": 7,
+   "species": [
+    "Blacktip Reef Shark",
+    "Bull Shark",
+    "Tiger Shark"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,1485 @@
+{
+ "reef": {
+  "i": 812,
+  "name": "Ningaloo (Exmouth)",
+  "lat": -21.9,
+  "lon": 113.95
+ },
+ "radius_km": 15.0,
+ "source": "IMOS Animal Tracking Facility, quality-controlled summarised acoustic detections (2007 - ongoing), AODN, CC BY 4.0",
+ "stations": [
+  {
+   "name": "NL5",
+   "lat": -21.8808,
+   "lon": 113.91,
+   "animals": 170,
+   "detections": 23691,
+   "first": "2009-06-13",
+   "last": "2024-11-09"
+  },
+  {
+   "name": "NL6",
+   "lat": -21.8801,
+   "lon": 113.9023,
+   "animals": 159,
+   "detections": 13465,
+   "first": "2009-06-13",
+   "last": "2024-11-09"
+  },
+  {
+   "name": "NL2",
+   "lat": -21.9,
+   "lon": 113.93,
+   "animals": 141,
+   "detections": 34986,
+   "first": "2008-10-16",
+   "last": "2024-10-28"
+  },
+  {
+   "name": "MB36A1",
+   "lat": -21.9644,
+   "lon": 113.9344,
+   "animals": 123,
+   "detections": 279467,
+   "first": "2007-12-03",
+   "last": "2013-05-26"
+  },
+  {
+   "name": "MB38A1A",
+   "lat": -21.96,
+   "lon": 113.93,
+   "animals": 116,
+   "detections": 34011,
+   "first": "2007-12-02",
+   "last": "2014-10-20"
+  },
+  {
+   "name": "MB20A",
+   "lat": -21.97,
+   "lon": 113.93,
+   "animals": 115,
+   "detections": 35179,
+   "first": "2007-12-01",
+   "last": "2014-10-20"
+  },
+  {
+   "name": "MB29",
+   "lat": -21.9942,
+   "lon": 113.9142,
+   "animals": 114,
+   "detections": 89437,
+   "first": "2007-12-02",
+   "last": "2014-07-11"
+  },
+  {
+   "name": "MB25A",
+   "lat": -21.9571,
+   "lon": 113.94,
+   "animals": 114,
+   "detections": 191181,
+   "first": "2007-12-04",
+   "last": "2014-10-21"
+  },
+  {
+   "name": "NL3",
+   "lat": -21.89,
+   "lon": 113.92,
+   "animals": 110,
+   "detections": 16901,
+   "first": "2008-08-30",
+   "last": "2024-12-15"
+  },
+  {
+   "name": "MB19",
+   "lat": -21.97,
+   "lon": 113.92,
+   "animals": 107,
+   "detections": 18538,
+   "first": "2007-12-01",
+   "last": "2016-03-27"
+  },
+  {
+   "name": "MB28A",
+   "lat": -21.98,
+   "lon": 113.9285,
+   "animals": 106,
+   "detections": 52347,
+   "first": "2007-12-02",
+   "last": "2014-10-21"
+  },
+  {
+   "name": "MB24A1",
+   "lat": -21.96,
+   "lon": 113.9393,
+   "animals": 102,
+   "detections": 95223,
+   "first": "2007-12-03",
+   "last": "2013-12-28"
+  },
+  {
+   "name": "MB11C",
+   "lat": -21.98,
+   "lon": 113.905,
+   "animals": 98,
+   "detections": 10372,
+   "first": "2007-12-03",
+   "last": "2013-05-25"
+  },
+  {
+   "name": "MB24B",
+   "lat": -21.96,
+   "lon": 113.94,
+   "animals": 95,
+   "detections": 127720,
+   "first": "2007-12-05",
+   "last": "2014-06-05"
+  },
+  {
+   "name": "MB16A",
+   "lat": -21.9879,
+   "lon": 113.9279,
+   "animals": 95,
+   "detections": 67170,
+   "first": "2007-12-03",
+   "last": "2014-07-06"
+  },
+  {
+   "name": "MB27",
+   "lat": -21.9925,
+   "lon": 113.92,
+   "animals": 93,
+   "detections": 130733,
+   "first": "2007-12-02",
+   "last": "2014-07-13"
+  },
+  {
+   "name": "MB30A",
+   "lat": -21.9877,
+   "lon": 113.9077,
+   "animals": 90,
+   "detections": 25691,
+   "first": "2007-12-01",
+   "last": "2014-09-17"
+  },
+  {
+   "name": "MB14A",
+   "lat": -21.98,
+   "lon": 113.91,
+   "animals": 89,
+   "detections": 28251,
+   "first": "2007-12-01",
+   "last": "2013-07-14"
+  },
+  {
+   "name": "NL4",
+   "lat": -21.89,
+   "lon": 113.92,
+   "animals": 89,
+   "detections": 29840,
+   "first": "2008-10-28",
+   "last": "2024-12-15"
+  },
+  {
+   "name": "MB31A",
+   "lat": -21.9877,
+   "lon": 113.9068,
+   "animals": 87,
+   "detections": 29588,
+   "first": "2007-12-03",
+   "last": "2014-10-20"
+  },
+  {
+   "name": "MB18A",
+   "lat": -21.9852,
+   "lon": 113.9152,
+   "animals": 86,
+   "detections": 72026,
+   "first": "2007-12-04",
+   "last": "2014-10-21"
+  },
+  {
+   "name": "MB44",
+   "lat": -21.99,
+   "lon": 113.9256,
+   "animals": 85,
+   "detections": 73881,
+   "first": "2007-12-01",
+   "last": "2014-10-21"
+  },
+  {
+   "name": "MBJH4A",
+   "lat": -21.99,
+   "lon": 113.9072,
+   "animals": 84,
+   "detections": 13214,
+   "first": "2009-01-18",
+   "last": "2014-03-01"
+  },
+  {
+   "name": "MBBOM1",
+   "lat": -21.984,
+   "lon": 113.92,
+   "animals": 80,
+   "detections": 391679,
+   "first": "2009-05-23",
+   "last": "2014-04-02"
+  },
+  {
+   "name": "MB22A",
+   "lat": -21.9667,
+   "lon": 113.92,
+   "animals": 78,
+   "detections": 16209,
+   "first": "2007-12-07",
+   "last": "2014-10-21"
+  },
+  {
+   "name": "MBJH1A",
+   "lat": -21.9593,
+   "lon": 113.91,
+   "animals": 78,
+   "detections": 7600,
+   "first": "2009-05-24",
+   "last": "2014-10-20"
+  },
+  {
+   "name": "NL7",
+   "lat": -21.88,
+   "lon": 113.9,
+   "animals": 77,
+   "detections": 7335,
+   "first": "2009-05-19",
+   "last": "2016-02-16"
+  },
+  {
+   "name": "MB46A",
+   "lat": -21.9699,
+   "lon": 113.9099,
+   "animals": 76,
+   "detections": 10729,
+   "first": "2009-05-30",
+   "last": "2014-10-20"
+  },
+  {
+   "name": "MBS6",
+   "lat": -21.97,
+   "lon": 113.94,
+   "animals": 74,
+   "detections": 412849,
+   "first": "2013-03-19",
+   "last": "2014-05-28"
+  },
+  {
+   "name": "MBS5",
+   "lat": -21.97,
+   "lon": 113.94,
+   "animals": 74,
+   "detections": 291328,
+   "first": "2013-03-19",
+   "last": "2014-05-28"
+  },
+  {
+   "name": "MBS7",
+   "lat": -21.96,
+   "lon": 113.94,
+   "animals": 73,
+   "detections": 58117,
+   "first": "2013-03-19",
+   "last": "2014-05-27"
+  },
+  {
+   "name": "MB23A",
+   "lat": -21.9619,
+   "lon": 113.9319,
+   "animals": 73,
+   "detections": 32638,
+   "first": "2007-12-04",
+   "last": "2013-06-06"
+  },
+  {
+   "name": "MBS3",
+   "lat": -21.97,
+   "lon": 113.94,
+   "animals": 73,
+   "detections": 143560,
+   "first": "2013-03-19",
+   "last": "2014-05-09"
+  },
+  {
+   "name": "MB72A",
+   "lat": -22.0,
+   "lon": 113.9,
+   "animals": 70,
+   "detections": 3973,
+   "first": "2007-12-06",
+   "last": "2014-10-20"
+  },
+  {
+   "name": "MB2A",
+   "lat": -21.9484,
+   "lon": 113.91,
+   "animals": 68,
+   "detections": 8984,
+   "first": "2007-12-06",
+   "last": "2014-10-19"
+  },
+  {
+   "name": "MB39",
+   "lat": -21.9742,
+   "lon": 113.92,
+   "animals": 68,
+   "detections": 8095,
+   "first": "2007-12-05",
+   "last": "2013-05-25"
+  },
+  {
+   "name": "MBS1",
+   "lat": -21.97,
+   "lon": 113.94,
+   "animals": 67,
+   "detections": 420116,
+   "first": "2013-03-19",
+   "last": "2014-05-26"
+  },
+  {
+   "name": "MB12A",
+   "lat": -21.9749,
+   "lon": 113.91,
+   "animals": 66,
+   "detections": 2054,
+   "first": "2007-12-06",
+   "last": "2013-12-27"
+  },
+  {
+   "name": "MBS2",
+   "lat": -21.97,
+   "lon": 113.94,
+   "animals": 64,
+   "detections": 145141,
+   "first": "2013-03-19",
+   "last": "2014-05-26"
+  },
+  {
+   "name": "MB6A",
+   "lat": -21.9883,
+   "lon": 113.91,
+   "animals": 64,
+   "detections": 13139,
+   "first": "2007-12-06",
+   "last": "2014-10-20"
+  },
+  {
+   "name": "MBS9",
+   "lat": -21.96,
+   "lon": 113.94,
+   "animals": 64,
+   "detections": 27805,
+   "first": "2013-03-25",
+   "last": "2014-05-27"
+  },
+  {
+   "name": "MB1A",
+   "lat": -22.01,
+   "lon": 113.8956,
+   "animals": 62,
+   "detections": 578,
+   "first": "2007-12-06",
+   "last": "2014-02-28"
+  },
+  {
+   "name": "MBJH5A",
+   "lat": -21.9967,
+   "lon": 113.9,
+   "animals": 61,
+   "detections": 1894,
+   "first": "2009-05-24",
+   "last": "2014-10-20"
+  },
+  {
+   "name": "MBS8",
+   "lat": -21.96,
+   "lon": 113.94,
+   "animals": 59,
+   "detections": 111943,
+   "first": "2013-03-25",
+   "last": "2014-05-27"
+  },
+  {
+   "name": "MB74A",
+   "lat": -21.9733,
+   "lon": 113.9133,
+   "animals": 58,
+   "detections": 12469,
+   "first": "2007-12-10",
+   "last": "2015-03-04"
+  },
+  {
+   "name": "MB43A1",
+   "lat": -22.0,
+   "lon": 113.9249,
+   "animals": 58,
+   "detections": 7201,
+   "first": "2007-12-09",
+   "last": "2013-05-09"
+  },
+  {
+   "name": "MBJH2A",
+   "lat": -21.96,
+   "lon": 113.91,
+   "animals": 57,
+   "detections": 14185,
+   "first": "2009-01-18",
+   "last": "2014-10-19"
+  },
+  {
+   "name": "MB37",
+   "lat": -22.0094,
+   "lon": 113.9194,
+   "animals": 54,
+   "detections": 46479,
+   "first": "2007-12-23",
+   "last": "2014-10-19"
+  },
+  {
+   "name": "MBBOM2",
+   "lat": -21.99,
+   "lon": 113.92,
+   "animals": 52,
+   "detections": 91413,
+   "first": "2009-05-24",
+   "last": "2014-03-29"
+  },
+  {
+   "name": "MB33",
+   "lat": -21.95,
+   "lon": 113.94,
+   "animals": 52,
+   "detections": 20922,
+   "first": "2008-02-18",
+   "last": "2013-02-07"
+  },
+  {
+   "name": "MBGT2",
+   "lat": -21.97,
+   "lon": 113.94,
+   "animals": 51,
+   "detections": 256324,
+   "first": "2013-02-26",
+   "last": "2014-10-21"
+  },
+  {
+   "name": "MBS11a",
+   "lat": -21.97,
+   "lon": 113.94,
+   "animals": 47,
+   "detections": 478580,
+   "first": "2013-03-26",
+   "last": "2014-05-29"
+  },
+  {
+   "name": "MB75",
+   "lat": -22.0083,
+   "lon": 113.92,
+   "animals": 46,
+   "detections": 14678,
+   "first": "2007-12-02",
+   "last": "2013-10-04"
+  },
+  {
+   "name": "MB73A",
+   "lat": -21.97,
+   "lon": 113.9178,
+   "animals": 45,
+   "detections": 65574,
+   "first": "2007-12-08",
+   "last": "2014-10-20"
+  },
+  {
+   "name": "MBJH7A",
+   "lat": -22.0,
+   "lon": 113.9,
+   "animals": 40,
+   "detections": 469,
+   "first": "2012-10-10",
+   "last": "2014-06-05"
+  },
+  {
+   "name": "MB32A",
+   "lat": -22.0,
+   "lon": 113.91,
+   "animals": 38,
+   "detections": 1138,
+   "first": "2007-12-24",
+   "last": "2014-10-19"
+  },
+  {
+   "name": "MB42A",
+   "lat": -21.9995,
+   "lon": 113.93,
+   "animals": 38,
+   "detections": 2431,
+   "first": "2007-12-09",
+   "last": "2014-03-01"
+  },
+  {
+   "name": "MB35A",
+   "lat": -21.9498,
+   "lon": 113.92,
+   "animals": 37,
+   "detections": 2205,
+   "first": "2007-12-05",
+   "last": "2014-03-06"
+  },
+  {
+   "name": "MB69B",
+   "lat": -21.98,
+   "lon": 113.9,
+   "animals": 36,
+   "detections": 3533,
+   "first": "2009-05-25",
+   "last": "2012-08-26"
+  },
+  {
+   "name": "MB40A",
+   "lat": -21.9485,
+   "lon": 113.9385,
+   "animals": 36,
+   "detections": 2983,
+   "first": "2008-02-28",
+   "last": "2013-05-19"
+  },
+  {
+   "name": "MB21A",
+   "lat": -21.9643,
+   "lon": 113.9243,
+   "animals": 35,
+   "detections": 1741,
+   "first": "2008-10-11",
+   "last": "2013-01-06"
+  },
+  {
+   "name": "MB15A",
+   "lat": -21.97,
+   "lon": 113.91,
+   "animals": 35,
+   "detections": 5097,
+   "first": "2007-12-04",
+   "last": "2013-05-30"
+  },
+  {
+   "name": "MB5C",
+   "lat": -21.97,
+   "lon": 113.9,
+   "animals": 35,
+   "detections": 1899,
+   "first": "2007-12-03",
+   "last": "2009-11-03"
+  },
+  {
+   "name": "MB68B",
+   "lat": -21.97,
+   "lon": 113.9,
+   "animals": 34,
+   "detections": 705,
+   "first": "2009-06-04",
+   "last": "2013-05-22"
+  },
+  {
+   "name": "MB13A1",
+   "lat": -21.9598,
+   "lon": 113.91,
+   "animals": 34,
+   "detections": 1603,
+   "first": "2007-12-04",
+   "last": "2014-03-01"
+  },
+  {
+   "name": "MBGT4",
+   "lat": -21.96,
+   "lon": 113.94,
+   "animals": 34,
+   "detections": 18099,
+   "first": "2013-02-26",
+   "last": "2014-10-24"
+  },
+  {
+   "name": "MBS10",
+   "lat": -21.96,
+   "lon": 113.94,
+   "animals": 33,
+   "detections": 24683,
+   "first": "2013-04-07",
+   "last": "2014-05-27"
+  },
+  {
+   "name": "Tant cfoc 3",
+   "lat": -21.92,
+   "lon": 113.96,
+   "animals": 31,
+   "detections": 6001,
+   "first": "2012-11-11",
+   "last": "2014-10-16"
+  },
+  {
+   "name": "MBGT3",
+   "lat": -21.99,
+   "lon": 113.93,
+   "animals": 31,
+   "detections": 1601,
+   "first": "2013-02-27",
+   "last": "2014-04-01"
+  },
+  {
+   "name": "MB34A",
+   "lat": -21.9469,
+   "lon": 113.93,
+   "animals": 29,
+   "detections": 7951,
+   "first": "2007-12-05",
+   "last": "2013-05-28"
+  },
+  {
+   "name": "MB26",
+   "lat": -21.9489,
+   "lon": 113.9289,
+   "animals": 29,
+   "detections": 8157,
+   "first": "2007-12-05",
+   "last": "2014-10-21"
+  },
+  {
+   "name": "MB41",
+   "lat": -21.98,
+   "lon": 113.93,
+   "animals": 28,
+   "detections": 377755,
+   "first": "2007-12-04",
+   "last": "2012-10-12"
+  },
+  {
+   "name": "MBBOM3",
+   "lat": -21.98,
+   "lon": 113.92,
+   "animals": 26,
+   "detections": 22669,
+   "first": "2009-01-22",
+   "last": "2009-11-07"
+  },
+  {
+   "name": "MB70B",
+   "lat": -21.9803,
+   "lon": 113.9,
+   "animals": 26,
+   "detections": 43968,
+   "first": "2009-01-18",
+   "last": "2011-07-03"
+  },
+  {
+   "name": "Tant cfoc 1",
+   "lat": -21.92,
+   "lon": 113.97,
+   "animals": 26,
+   "detections": 3711,
+   "first": "2012-11-11",
+   "last": "2014-10-19"
+  },
+  {
+   "name": "Tant cfoc 2",
+   "lat": -21.92,
+   "lon": 113.96,
+   "animals": 25,
+   "detections": 4168,
+   "first": "2012-11-08",
+   "last": "2014-10-18"
+  },
+  {
+   "name": "Tant cfoc 4",
+   "lat": -21.91,
+   "lon": 113.96,
+   "animals": 23,
+   "detections": 1411,
+   "first": "2012-11-13",
+   "last": "2015-01-11"
+  },
+  {
+   "name": "MB45A",
+   "lat": -21.99,
+   "lon": 113.92,
+   "animals": 23,
+   "detections": 1523,
+   "first": "2008-02-18",
+   "last": "2012-06-26"
+  },
+  {
+   "name": "Tant cfoc 7",
+   "lat": -21.91,
+   "lon": 113.94,
+   "animals": 20,
+   "detections": 5249,
+   "first": "2012-11-10",
+   "last": "2014-10-18"
+  },
+  {
+   "name": "Tant cfoc 6",
+   "lat": -21.91,
+   "lon": 113.95,
+   "animals": 20,
+   "detections": 1930,
+   "first": "2012-11-10",
+   "last": "2014-10-16"
+  },
+  {
+   "name": "MB9B",
+   "lat": -21.97,
+   "lon": 113.9,
+   "animals": 18,
+   "detections": 444,
+   "first": "2008-02-03",
+   "last": "2009-11-02"
+  },
+  {
+   "name": "MB8B",
+   "lat": -21.99,
+   "lon": 113.89,
+   "animals": 14,
+   "detections": 188,
+   "first": "2007-12-06",
+   "last": "2008-06-23"
+  },
+  {
+   "name": "MB71B",
+   "lat": -21.99,
+   "lon": 113.9,
+   "animals": 13,
+   "detections": 2263,
+   "first": "2007-12-07",
+   "last": "2008-06-04"
+  },
+  {
+   "name": "MBS11",
+   "lat": -21.97,
+   "lon": 113.94,
+   "animals": 5,
+   "detections": 1780,
+   "first": "2013-03-26",
+   "last": "2013-06-16"
+  },
+  {
+   "name": "MBJH3A",
+   "lat": -21.97,
+   "lon": 113.91,
+   "animals": 2,
+   "detections": 10,
+   "first": "2013-05-25",
+   "last": "2013-07-06"
+  }
+ ],
+ "species": [
+  {
+   "common": "Spangled Emperor",
+   "scientific": "Lethrinus nebulosus",
+   "animals": 73,
+   "days": 1174,
+   "first": "2007-12-01",
+   "last": "2021-07-17"
+  },
+  {
+   "common": "Lemon Shark",
+   "scientific": "Negaprion acutidens",
+   "animals": 61,
+   "days": 1401,
+   "first": "2008-02-22",
+   "last": "2024-11-09"
+  },
+  {
+   "common": "Blacktip Reef Shark",
+   "scientific": "Carcharhinus melanopterus",
+   "animals": 52,
+   "days": 1528,
+   "first": "2008-01-09",
+   "last": "2019-11-19"
+  },
+  {
+   "common": "Sandbar Shark",
+   "scientific": "Carcharhinus plumbeus",
+   "animals": 51,
+   "days": 2027,
+   "first": "2011-07-02",
+   "last": "2024-10-29"
+  },
+  {
+   "common": "Tiger Shark",
+   "scientific": "Galeocerdo cuvier",
+   "animals": 48,
+   "days": 1071,
+   "first": "2008-02-26",
+   "last": "2024-12-15"
+  },
+  {
+   "common": "Dusky Whaler",
+   "scientific": "Carcharhinus obscurus",
+   "animals": 46,
+   "days": 348,
+   "first": "2011-08-18",
+   "last": "2021-11-22"
+  },
+  {
+   "common": "green turtle",
+   "scientific": "Chelonia mydas",
+   "animals": 34,
+   "days": 770,
+   "first": "2013-02-22",
+   "last": "2016-03-24"
+  },
+  {
+   "common": "Grey Reef Shark",
+   "scientific": "Carcharhinus amblyrhynchos",
+   "animals": 31,
+   "days": 1324,
+   "first": "2008-02-25",
+   "last": "2018-07-09"
+  },
+  {
+   "common": "Whale Shark",
+   "scientific": "Rhincodon typus",
+   "animals": 31,
+   "days": 181,
+   "first": "2011-09-11",
+   "last": "2017-12-15"
+  },
+  {
+   "common": "Redblotched Wrasse",
+   "scientific": "Coris aygula",
+   "animals": 19,
+   "days": 485,
+   "first": "2007-12-01",
+   "last": "2011-11-11"
+  },
+  {
+   "common": "Cowtail Stingray",
+   "scientific": "Pastinachus ater",
+   "animals": 17,
+   "days": 774,
+   "first": "2008-02-22",
+   "last": "2013-03-21"
+  },
+  {
+   "common": "Silver Drummer",
+   "scientific": "Kyphosus sydneyanus",
+   "animals": 15,
+   "days": 705,
+   "first": "2009-01-22",
+   "last": "2013-01-09"
+  },
+  {
+   "common": "Turrum",
+   "scientific": "Carangoides fulvoguttatus",
+   "animals": 13,
+   "days": 510,
+   "first": "2007-12-01",
+   "last": "2009-11-09"
+  },
+  {
+   "common": "Yellowtail Emperor",
+   "scientific": "Lethrinus atkinsoni",
+   "animals": 13,
+   "days": 175,
+   "first": "2009-01-30",
+   "last": "2009-11-09"
+  },
+  {
+   "common": "Greenfin Parrotfish",
+   "scientific": "Chlorurus sordidus",
+   "animals": 12,
+   "days": 169,
+   "first": "2008-06-02",
+   "last": "2009-11-09"
+  },
+  {
+   "common": "Nervous Shark",
+   "scientific": "Carcharhinus cautus",
+   "animals": 11,
+   "days": 307,
+   "first": "2008-02-22",
+   "last": "2012-07-27"
+  },
+  {
+   "common": "Manta Ray",
+   "scientific": "Mobula alfredi",
+   "animals": 9,
+   "days": 25,
+   "first": "2008-02-18",
+   "last": "2009-09-26"
+  },
+  {
+   "common": "Rankin Cod",
+   "scientific": "Epinephelus multinotatus",
+   "animals": 8,
+   "days": 635,
+   "first": "2008-05-26",
+   "last": "2013-03-08"
+  },
+  {
+   "common": "Giant Shovelnose Ray",
+   "scientific": "Glaucostegus typus",
+   "animals": 8,
+   "days": 161,
+   "first": "2008-02-25",
+   "last": "2009-11-08"
+  },
+  {
+   "common": "Common Blacktip Shark",
+   "scientific": "Carcharhinus limbatus",
+   "animals": 7,
+   "days": 807,
+   "first": "2011-06-09",
+   "last": "2018-07-27"
+  },
+  {
+   "common": "Yellowedge Coronation Trout",
+   "scientific": "Variola louti",
+   "animals": 5,
+   "days": 638,
+   "first": "2008-05-29",
+   "last": "2012-10-15"
+  },
+  {
+   "common": "Jenkins' Whipray",
+   "scientific": "Pateobatis jenkinsii",
+   "animals": 5,
+   "days": 260,
+   "first": "2009-08-31",
+   "last": "2012-10-30"
+  },
+  {
+   "common": "Porcupine Ray",
+   "scientific": "Urogymnus asperrimus",
+   "animals": 5,
+   "days": 195,
+   "first": "2008-02-24",
+   "last": "2012-01-07"
+  },
+  {
+   "common": "Reticulate Whipray",
+   "scientific": "Himantura australis",
+   "animals": 5,
+   "days": 127,
+   "first": "2009-05-30",
+   "last": "2011-08-21"
+  },
+  {
+   "common": "Yellowtail Kingfish",
+   "scientific": "Seriola lalandi",
+   "animals": 5,
+   "days": 36,
+   "first": "2013-03-26",
+   "last": "2013-06-16"
+  },
+  {
+   "common": "Greasy Rockcod",
+   "scientific": "Epinephelus tauvina",
+   "animals": 4,
+   "days": 135,
+   "first": "2008-05-28",
+   "last": "2009-11-03"
+  },
+  {
+   "common": "Chinaman Rockcod",
+   "scientific": "Epinephelus rivulatus",
+   "animals": 4,
+   "days": 69,
+   "first": "2007-12-04",
+   "last": "2009-10-31"
+  },
+  {
+   "common": "Whitetip Reef Shark",
+   "scientific": "Triaenodon obesus",
+   "animals": 3,
+   "days": 1182,
+   "first": "2009-05-22",
+   "last": "2015-07-01"
+  },
+  {
+   "common": "Green Jobfish",
+   "scientific": "Aprion virescens",
+   "animals": 3,
+   "days": 108,
+   "first": "2009-01-18",
+   "last": "2011-05-23"
+  },
+  {
+   "common": "Pink Whipray",
+   "scientific": "Pateobatis fai",
+   "animals": 3,
+   "days": 60,
+   "first": "2009-06-26",
+   "last": "2013-03-15"
+  },
+  {
+   "common": "Bronze Whaler",
+   "scientific": "Carcharhinus brachyurus",
+   "animals": 3,
+   "days": 3,
+   "first": "2014-09-16",
+   "last": "2018-03-09"
+  },
+  {
+   "common": "Surf Parrotfish",
+   "scientific": "Scarus rivulatus",
+   "animals": 2,
+   "days": 134,
+   "first": "2009-05-23",
+   "last": "2009-11-08"
+  },
+  {
+   "common": "Bluespine Unicornfish",
+   "scientific": "Naso unicornis",
+   "animals": 2,
+   "days": 96,
+   "first": "2009-01-30",
+   "last": "2009-11-06"
+  },
+  {
+   "common": "Bluespotted Fantail Ray",
+   "scientific": "Taeniura lymma",
+   "animals": 2,
+   "days": 21,
+   "first": "2009-08-21",
+   "last": "2009-11-04"
+  },
+  {
+   "common": "Gummy Shark",
+   "scientific": "Mustelus antarcticus",
+   "animals": 2,
+   "days": 3,
+   "first": "2014-09-24",
+   "last": "2019-02-24"
+  },
+  {
+   "common": "Smoothnose Wedgefish",
+   "scientific": "Rhynchobatus laevis",
+   "animals": 1,
+   "days": 388,
+   "first": "2009-08-30",
+   "last": "2012-12-28"
+  },
+  {
+   "common": "Common Coral Trout",
+   "scientific": "Plectropomus leopardus",
+   "animals": 1,
+   "days": 139,
+   "first": "2008-05-28",
+   "last": "2009-02-14"
+  },
+  {
+   "common": "Bluebarred Parrotfish",
+   "scientific": "Scarus ghobban",
+   "animals": 1,
+   "days": 5,
+   "first": "2009-05-26",
+   "last": "2009-06-07"
+  },
+  {
+   "common": "Leopard Whipray",
+   "scientific": "Himantura leoparda",
+   "animals": 1,
+   "days": 2,
+   "first": "2012-02-07",
+   "last": "2012-02-20"
+  },
+  {
+   "common": "White Shark",
+   "scientific": "Carcharodon carcharias",
+   "animals": 1,
+   "days": 1,
+   "first": "2013-11-02",
+   "last": "2013-11-02"
+  }
+ ],
+ "links": [
+  {
+   "station": "CL9",
+   "lat": -22.59,
+   "lon": 113.61,
+   "km": 84,
+   "animals": 119,
+   "species": [
+    "Blacktip Reef Shark",
+    "Common Blacktip Shark",
+    "Dusky Whaler",
+    "Lemon Shark",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark",
+    "White Shark"
+   ]
+  },
+  {
+   "station": "CL8",
+   "lat": -22.6,
+   "lon": 113.61,
+   "km": 85,
+   "animals": 116,
+   "species": [
+    "Blacktip Reef Shark",
+    "Dusky Whaler",
+    "Grey Reef Shark",
+    "Lemon Shark",
+    "Manta Ray",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark",
+    "White Shark"
+   ]
+  },
+  {
+   "station": "SL8",
+   "lat": -23.13,
+   "lon": 113.71,
+   "km": 139,
+   "animals": 76,
+   "species": [
+    "Blacktip Reef Shark",
+    "Common Blacktip Shark",
+    "Dusky Whaler",
+    "Grey Reef Shark",
+    "Gummy Shark",
+    "Lemon Shark",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "CL7",
+   "lat": -22.6,
+   "lon": 113.62,
+   "km": 85,
+   "animals": 75,
+   "species": [
+    "Blacktip Reef Shark",
+    "Dusky Whaler",
+    "Grey Reef Shark",
+    "Lemon Shark",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "SL7",
+   "lat": -23.13,
+   "lon": 113.72,
+   "km": 139,
+   "animals": 72,
+   "species": [
+    "Dusky Whaler",
+    "Gummy Shark",
+    "Lemon Shark",
+    "Manta Ray",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "SL9",
+   "lat": -23.1214,
+   "lon": 113.7,
+   "km": 138,
+   "animals": 63,
+   "species": [
+    "Common Blacktip Shark",
+    "Dusky Whaler",
+    "Lemon Shark",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "SL11",
+   "lat": -23.12,
+   "lon": 113.69,
+   "km": 138,
+   "animals": 58,
+   "species": [
+    "Dusky Whaler",
+    "Lemon Shark",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "Turq cfoc 7",
+   "lat": -22.09,
+   "lon": 113.87,
+   "km": 23,
+   "animals": 53,
+   "species": [
+    "Blacktip Reef Shark",
+    "Common Blacktip Shark",
+    "Dusky Whaler",
+    "Grey Reef Shark",
+    "Lemon Shark",
+    "Sandbar Shark",
+    "Spangled Emperor",
+    "Tiger Shark",
+    "Whale Shark",
+    "green turtle"
+   ]
+  },
+  {
+   "station": "SL10",
+   "lat": -23.12,
+   "lon": 113.7,
+   "km": 138,
+   "animals": 53,
+   "species": [
+    "Dusky Whaler",
+    "Lemon Shark",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "SL6",
+   "lat": -23.13,
+   "lon": 113.73,
+   "km": 139,
+   "animals": 45,
+   "species": [
+    "Dusky Whaler",
+    "Lemon Shark",
+    "Manta Ray",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "SL15",
+   "lat": -23.12,
+   "lon": 113.66,
+   "km": 139,
+   "animals": 43,
+   "species": [
+    "Dusky Whaler",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "SL17",
+   "lat": -23.12,
+   "lon": 113.65,
+   "km": 139,
+   "animals": 42,
+   "species": [
+    "Dusky Whaler",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "SL16",
+   "lat": -23.12,
+   "lon": 113.65,
+   "km": 139,
+   "animals": 41,
+   "species": [
+    "Dusky Whaler",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "SL19",
+   "lat": -23.12,
+   "lon": 113.63,
+   "km": 140,
+   "animals": 41,
+   "species": [
+    "Dusky Whaler",
+    "Grey Reef Shark",
+    "Lemon Shark",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "Turq cfoc 6",
+   "lat": -22.09,
+   "lon": 113.87,
+   "km": 23,
+   "animals": 40,
+   "species": [
+    "Blacktip Reef Shark",
+    "Common Blacktip Shark",
+    "Dusky Whaler",
+    "Grey Reef Shark",
+    "Lemon Shark",
+    "Sandbar Shark",
+    "Spangled Emperor",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "SL18",
+   "lat": -23.12,
+   "lon": 113.64,
+   "km": 139,
+   "animals": 39,
+   "species": [
+    "Dusky Whaler",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "SL21",
+   "lat": -23.11,
+   "lon": 113.62,
+   "km": 139,
+   "animals": 38,
+   "species": [
+    "Dusky Whaler",
+    "Grey Reef Shark",
+    "Sandbar Shark",
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "SL20",
+   "lat": -23.12,
+   "lon": 113.62,
+   "km": 140,
+   "animals": 38,
+   "species": [
+    "Dusky Whaler",
+    "Grey Reef Shark",
+    "Sandbar Shark",
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "CL10",
+   "lat": -22.59,
+   "lon": 113.6,
+   "km": 85,
+   "animals": 36,
+   "species": [
+    "Common Blacktip Shark",
+    "Dusky Whaler",
+    "Sandbar Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "SL5",
+   "lat": -23.13,
+   "lon": 113.73,
+   "km": 139,
+   "animals": 35,
+   "species": [
+    "Blacktip Reef Shark",
+    "Common Blacktip Shark",
+    "Dusky Whaler",
+    "Lemon Shark",
+    "Manta Ray",
+    "Sandbar Shark",
+    "Spangled Emperor",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "CL6",
+   "lat": -22.6,
+   "lon": 113.63,
+   "km": 85,
+   "animals": 32,
+   "species": [
+    "Blacktip Reef Shark",
+    "Dusky Whaler",
+    "Grey Reef Shark",
+    "Lemon Shark",
+    "Manta Ray",
+    "Spangled Emperor",
+    "Tiger Shark",
+    "Turrum",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "CL11",
+   "lat": -22.59,
+   "lon": 113.59,
+   "km": 85,
+   "animals": 31,
+   "species": [
+    "Dusky Whaler",
+    "Sandbar Shark",
+    "Tiger Shark",
+    "Whale Shark"
+   ]
+  },
+  {
+   "station": "23rd Parallel West",
+   "lat": -23.0,
+   "lon": 113.76,
+   "km": 124,
+   "animals": 29,
+   "species": [
+    "Blacktip Reef Shark",
+    "Dusky Whaler",
+    "Grey Reef Shark",
+    "Manta Ray",
+    "Sandbar Shark",
+    "Spangled Emperor",
+    "Tiger Shark",
+    "Whale Shark",
+    "green turtle"
+   ]
+  },
+  {
+   "station": "SL12",
+   "lat": -23.12,
+   "lon": 113.68,
+   "km": 138,
+   "animals": 27,
+   "species": [
+    "Dusky Whaler",
+    "Lemon Shark",
+    "Sandbar Shark",
+    "Tiger Shark"
+   ]
+  },
+  {
+   "station": "Turq cfoc 5",
+   "lat": -22.09,
+   "lon": 113.88,
+   "km": 22,
+   "animals": 24,
+   "species": [
+    "Blacktip Reef Shark",
+    "Common Blacktip Shark",
+    "Dusky Whaler",
+    "Grey Reef Shark",
+    "Lemon Shark",
+    "Spangled Emperor",
+    "Tiger Shark",
+    "Whale Shark",
+    "green turtle"
+   ]
+  }
+ ]
+}

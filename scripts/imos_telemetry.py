@@ -136,15 +136,18 @@ def main():
     a.out.mkdir(parents=True, exist_ok=True)
 
     for r in REEFS:
-        con.create_function("dist", lambda la, lo, r=r: km(r["lat"], r["lon"], la, lo), [float, float], float, replace=True)
-        near = f"SELECT * FROM d WHERE lat IS NOT NULL AND dist(lat, lon) <= {RADIUS_KM}"
+        # Same haversine as km(), in SQL so DuckDB does not call back into Python per row.
+        def dist(la, lo, r=r):
+            return (f"12742 * asin(sqrt(pow(sin(radians({la} - {r['lat']}) / 2), 2) + cos(radians({r['lat']})) * cos(radians({la}))"
+                    f" * pow(sin(radians({lo} - {r['lon']}) / 2), 2)))")
+        near = f"SELECT * FROM d WHERE lat IS NOT NULL AND {dist('lat', 'lon')} <= {RADIUS_KM}"
         stations = con.execute(f"SELECT station, avg(lat), avg(lon), count(DISTINCT animal), sum(n), min(day), max(day) FROM ({near}) GROUP BY station ORDER BY 4 DESC").fetchall()
         species = con.execute(f"SELECT common, sci, count(DISTINCT animal), count(DISTINCT day), min(day), max(day) FROM ({near}) GROUP BY common, sci ORDER BY 3 DESC, 4 DESC").fetchall()
         # Where else the animals detected here were heard: the reef's movement links.
         links = con.execute(
             f"""SELECT o.station, avg(o.lat), avg(o.lon), count(DISTINCT o.animal), list(DISTINCT o.common)
                 FROM d o WHERE o.animal IN (SELECT DISTINCT animal FROM ({near}))
-                AND o.lat IS NOT NULL AND dist(o.lat, o.lon) > {RADIUS_KM}
+                AND o.lat IS NOT NULL AND {dist('o.lat', 'o.lon')} > {RADIUS_KM}
                 GROUP BY o.station ORDER BY 4 DESC LIMIT 25"""
         ).fetchall()
         out = {
