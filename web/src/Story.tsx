@@ -330,6 +330,8 @@ export function Story() {
             <dd>Local pressure comes from WCS's global map of six human pressures on reefs (Andrello et al. 2022): fishing, nitrogen and sediment runoff, coastal population, tourism, and ports. Connection to other reefs, which brings in coral larvae, comes from the 50 Reefs analysis (Beyer et al. 2018). Neither changes the bleaching model. They rank where restoration is most likely to last.</dd>
             <dt>Limits and safeguards</dt>
             <dd>Surveys are densest in Australia, the Caribbean and Southeast Asia, so the model is least sure elsewhere. It shows where heat makes restoration hard. It does not decide for the people who depend on a reef. A reef marked too hot still needs protection, and the call stays with local communities. Heat-tolerant coral from breeding or assisted gene flow can cut genetic diversity, so sourcing stays local and is monitored. Code and data are open so anyone can check the numbers.</dd>
+            <dt>Open source</dt>
+            <dd>Reef Margin is an open, community-led tool. The model, the data joins and this map are public, built only on open data. Restoration teams and divers can add their own surveys, which retrain the model and make it surer where it is weakest today.</dd>
             <dt>The reef you see</dt>
             <dd>A reconstruction, not a photo. The mix of coral, rock, rubble, sand and seagrass comes from the Allen Coral Atlas satellite map of this reef. The corals are Smithsonian scans (CC0) of species from the same ocean. Each year the model's risk sets how many colonies bleach, sensitive species first, as in past heatwaves (Loya et al. 2001).</dd>
           </dl>

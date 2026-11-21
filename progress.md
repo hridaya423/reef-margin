@@ -115,3 +115,5 @@ Outlier persistence (sites with DHW>=4 in both periods): 24 sites, rho 0.31 (p 0
 ## Pipeline incident 16:20
 - The pipeline call restarted itself at 16:16 and relaunched pretraining from step 0. Both pretrains had finished (checkpoints at step 60000, backed up to `ckpt_saved/`).
 - Stopped the app, made `pipeline` skip finished stages (`ckpt/<name>.done`, existing trees and corpus), redeployed, relaunched as fc-01M7ZESW0NE4RS6D7KJD29ESQY. GBR depth download relaunched as fc-01M7ZESWATFD203KAAZMJQ12GH (curl was missing; now uses requests).
+
+- Entity type for Realism: Open-source / Community-led (user choice, 21 Nov). About dialog has an "Open source" entry. Repo is still private; making it public is the user's call.
