@@ -66,3 +66,23 @@ export function decadeCount(y: Years, k: number, from: number) {
   });
   return c;
 }
+
+export const bleachShare = (risk: number) => {
+  const x = Math.min(1, Math.max(0, (risk - 0.25) / 0.45));
+  return x * x * (3 - 2 * x);
+};
+
+export const MORTALITY = 0.4;
+export const REGROWTH = 0.14;
+
+export type ReefYear = { white: number; dead: number; left: number };
+
+export function reefHistory(y: Years, k: number): ReefYear[] {
+  let dead = 0;
+  return y.years.map((_, t) => {
+    const before = dead * (1 - REGROWTH);
+    const white = bleachShare(y.ann[t * y.n + k] / y.scale) * (1 - before);
+    dead = before + MORTALITY * white;
+    return { white, dead: before, left: 1 - dead };
+  });
+}

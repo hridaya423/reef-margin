@@ -327,7 +327,7 @@ export function App() {
       <header className="topbar">
         <div className="brand">
           <Mark size={24} />
-          Coralitics
+          Coralytics
         </div>
         <nav className="tabs" role="tablist" aria-label="Views">
           {TABS.map((t) => (

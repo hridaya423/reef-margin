@@ -33,7 +33,7 @@ if [ -z "${SKETCHFAB_TOKEN:-}" ]; then
   echo "Set SKETCHFAB_TOKEN to fetch the Sketchfab scans" >&2
   exit 0
 fi
-for pair in f67977f513e74259ae2b3a9b36965641:heron 8bc72c9e4575470ea30d1313e48b730c:belize 56296264dad244eab43874fe8f419f99:okinawa 3f67b6d2bc77407abe2b36f982c28370:maui 0d30ab66bd53405890d1f449c08227d8:mayotte c76bb390aa7d4c069a51257cb5f9cbdf:usvi2016 7a1ec7e990f54c028b10ef1fe714c0c6:whitsunday a4334470bf9047edad8358475f10ff18:onetree 2c33a8d8962646e4afd17bb9566d22b6:thailand; do
+for pair in f67977f513e74259ae2b3a9b36965641:heron 8bc72c9e4575470ea30d1313e48b730c:belize 56296264dad244eab43874fe8f419f99:okinawa 0d30ab66bd53405890d1f449c08227d8:mayotte c76bb390aa7d4c069a51257cb5f9cbdf:usvi2016 7a1ec7e990f54c028b10ef1fe714c0c6:whitsunday a4334470bf9047edad8358475f10ff18:onetree 2c33a8d8962646e4afd17bb9566d22b6:thailand; do
   uid=${pair%%:*}
   name=${pair##*:}
   out=web/public/scans/sf_$name.splat

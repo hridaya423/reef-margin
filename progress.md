@@ -127,7 +127,14 @@ Outlier persistence (sites with DHW>=4 in both periods): 24 sites, rho 0.31 (p 0
 - Reef soundscapes (bens-bots/marrs-global-coral-reef-soundscapes, CC BY 4.0) checked: daytime raw clips do not separate healthy from degraded by energy. Not used yet.
 - Boström-Einarsson restoration database (Dryad) is behind a bot check; needs a browser download to `data/restoration/`.
 
-## Coralitics, scans everywhere, restoration projects 17:40
-- Renamed to Coralitics. Logo: "02 Decade ring" (user choice) from `design/logo-variants.html`. Mark = 22 year ticks forming a C, brown to bleached. `web/src/Mark.tsx`, assets in `web/public/brand/` (colour, black, white, icon). GitHub repo still named reef-margin; renaming it is the user's call.
+## Coralytics, scans everywhere, restoration projects 17:40
+- Renamed to Coralytics. Logo: "02 Decade ring" (user choice) from `design/logo-variants.html`. Mark = 22 year ticks forming a C, brown to bleached. `web/src/Mark.tsx`, assets in `web/public/brand/` (colour, black, white, icon). GitHub repo still named reef-margin; renaming it is the user's call.
 - Real scans from 18 files: 6 Soneva (Maldives), 2 Galapagos_3D (Zenodo 14914807, point clouds -> disc splats via `tools/points_convert.py`), 10 Sketchfab CC BY meshes (GBR Heron/One Tree/Whitsundays, Belize, USVI x2, Okinawa, Maui, Mayotte, Thailand; `tools/mesh_convert.py` samples textured surfaces into disc splats). `web/src/scans.ts` picks the nearest scan per reef and the label states the distance. Sketchfab needs SKETCHFAB_TOKEN for `tools/fetch_scans.sh`.
 - Restoration projects: Boström-Einarsson et al. 2020 database (user downloaded from Dryad; in `data/restoration/`). 304 projects, 224 within 25 km of a scored reef (`web/public/data/projects.json`). No project's location rationale names heat or bleaching. Today: 134 savable, 76 hold, 14 beyond (6%). At +0.5 C: 148 beyond (66%), 0 hold. Survival vs recent heat: no significant difference (short monitoring). Map shows projects as rings; home panel counts live with the warming switch.
+
+## Dashboard streamline, reef history, blue mark 18:40
+- Home panel is a tool, not a pitch: search by country or region, warming switch, triage bar with three shares, ranked "Best places to restore" with bleaching years and local pressure columns, CSV download of the whole scoped ranking. Pitch stats (world strip, projects block, proof line) removed from the dashboard; they live in About and the slides.
+- Bleaching now accumulates. `reefHistory` in `model.ts`: each year a share of living coral bleaches (smoothstep of risk 0.25 to 0.7), 40% of bleached coral dies, dead coral regrows 14% a year. Illustrative, stated in About. The scan shows living (scan colours), bleached (white), dead (grey-green algae); the year strip shows the same three as stacked bars, plus "% of coral left".
+- Name spelled Coralytics everywhere (brand files renamed). Mark gradient is ocean blue #1666a8 to pale #b9daf0 (option A).
+- Search results with repeated region names show coordinates.
+- Scan check (local headless Chrome, `scratchpad/shoot_local.py`, 52 s for all shots): Heron, Mayotte, Whitsundays, Belize, Galapagos look right. Maui dropped: its Sketchfab mesh is mostly a stretched base skirt with the reef on one edge. 17 scans remain. USVI is a single coral mound, framed close.

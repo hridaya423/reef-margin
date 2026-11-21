@@ -2,7 +2,7 @@ import NumberFlow from "@number-flow/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getDepth, getHabitat, getLayer, getYears, type Depth, type Habitat, type Reef, type Years } from "./api";
 import { ATLANTIC, PACIFIC, ReefScene, type Mix, type Taxon } from "./ReefScene";
-import { bleachYears, decadeCount, HOLD_MAX, triageYears, type Triage } from "./model";
+import { bleachYears, decadeCount, HOLD_MAX, type ReefYear, reefHistory, triageYears, type Triage } from "./model";
 import { ReefMap, VERDICT_COLOR, type Project } from "./ReefMap";
 import { Mark } from "./Mark";
 import { ScanScene } from "./ScanScene";
@@ -51,11 +51,12 @@ const getStatic = <T,>(file: string, signal: AbortSignal) =>
     return r.json() as Promise<T>;
   });
 
+const coords = (r: Reef) => `${Math.abs(r.lat).toFixed(2)}° ${r.lat >= 0 ? "N" : "S"}, ${Math.abs(r.lon).toFixed(2)}° ${r.lon >= 0 ? "E" : "W"}`;
+
 const reefName = (r: Reef) => {
   const ex = EXAMPLES.find((e) => e.i === r.i);
   if (ex) return { name: ex.name, place: ex.place };
-  const at = `${Math.abs(r.lat).toFixed(2)}° ${r.lat >= 0 ? "N" : "S"}, ${Math.abs(r.lon).toFixed(2)}° ${r.lon >= 0 ? "E" : "W"}`;
-  return { name: r.eco || r.country || "Reef", place: r.country && r.eco && r.country !== r.eco ? r.country : at };
+  return { name: r.eco || r.country || "Reef", place: r.country && r.eco && r.country !== r.eco ? r.country : coords(r) };
 };
 
 const taxaFor = (r: Reef): Taxon[] => (r.realm === "Tropical Atlantic" ? ATLANTIC : PACIFIC);
@@ -75,14 +76,13 @@ function mixOf(h: Habitat): Mix | null {
   if (total < 0.05) return null;
   return { coral: m.coral / total, rock: m.rock / total, rubble: m.rubble / total, sand: m.sand / total, seagrass: m.seagrass / total };
 }
-const bleachOf = (risk: number) => {
-  const x = Math.min(1, Math.max(0, (risk - 0.3) / 0.3));
-  return x * x * (3 - 2 * x);
-};
-const tileColor = (risk: number) => {
-  const b = bleachOf(risk);
-  const mix = (a: number, c: number) => Math.round(a + (c - a) * b);
-  return `rgb(${mix(140, 247)} ${mix(88, 244)} ${mix(44, 236)})`;
+const LIVING = "#9a6235";
+const BLEACHED = "#f3efe6";
+const DEAD = "#5f6652";
+const coverBar = (h: ReefYear) => {
+  const live = (1 - h.dead - h.white) * 100;
+  const white = live + h.white * 100;
+  return `linear-gradient(to top, ${LIVING} 0 ${live}%, ${BLEACHED} ${live}% ${white}%, ${DEAD} ${white}% 100%)`;
 };
 
 function readReef() {
@@ -102,6 +102,7 @@ export function Story() {
   const [habitat, setHabitat] = useState<{ i: number; mix: Mix | null } | null>(null);
   const [depth, setDepth] = useState<{ i: number; d: Depth } | null>(null);
   const [view, setView] = useState<View>("scan");
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     const ctl = new AbortController();
@@ -133,19 +134,23 @@ export function Story() {
 
   const shift = warm ? 0.5 : 0;
   const verdicts = useMemo(() => (data ? data.reefs.map((_, k) => triageYears(data.years, k, shift, GAIN)) : []), [data, shift]);
+  const matches = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!data || q.length < 2) return null;
+    return new Set(data.reefs.filter((x) => `${x.eco} ${x.country} ${reefName(x).name}`.toLowerCase().includes(q)).map((x) => x.i));
+  }, [data, query]);
+
   const shares = useMemo(() => {
     const c = { holds: 0, savable: 0, beyond: 0 };
-    for (const v of verdicts) c[v]++;
-    const n = Math.max(verdicts.length, 1);
-    return { holds: c.holds / n, savable: c.savable / n, beyond: c.beyond / n };
-  }, [verdicts]);
-
-  const projectShares = useMemo(() => {
-    const c = { holds: 0, savable: 0, beyond: 0 };
-    if (!data) return c;
-    for (const [, , cell] of data.projects) c[verdicts[cell]]++;
-    return c;
-  }, [data, verdicts]);
+    let n = 0;
+    verdicts.forEach((v, i) => {
+      if (matches && !matches.has(i)) return;
+      c[v]++;
+      n++;
+    });
+    const d = Math.max(n, 1);
+    return { n, holds: c.holds / d, savable: c.savable / d, beyond: c.beyond / d };
+  }, [verdicts, matches]);
 
   const ranking = useMemo(() => {
     if (!data) return { order: [] as number[], rank: new Map<number, number>() };
@@ -154,19 +159,48 @@ export function Story() {
     return { order, rank: new Map(order.map((i, k) => [i, k])) };
   }, [data, verdicts]);
 
-  const bestBets = useMemo(() => {
+  const focus = useMemo((): [number, number, number, number] | null => {
+    if (!data || !matches || matches.size === 0) return null;
+    let [w, so, e, n] = [180, 90, -180, -90];
+    for (const i of matches) {
+      const r = data.reefs[i];
+      w = Math.min(w, r.lon); e = Math.max(e, r.lon); so = Math.min(so, r.lat); n = Math.max(n, r.lat);
+    }
+    return e - w > 180 ? null : [w, so, e, n];
+  }, [data, matches]);
+
+  const scoped = useMemo(() => (matches ? ranking.order.filter((i) => matches.has(i)) : ranking.order), [ranking, matches]);
+
+  const shortlist = useMemo(() => {
     if (!data) return [];
+    if (matches) return scoped.slice(0, 6);
     const seen = new Set<string>();
     const out: number[] = [];
-    for (const i of ranking.order) {
+    for (const i of scoped) {
       const key = data.reefs[i].country || data.reefs[i].eco;
       if (seen.has(key)) continue;
       seen.add(key);
       out.push(i);
-      if (out.length === 4) break;
+      if (out.length === 6) break;
     }
     return out;
-  }, [data, ranking]);
+  }, [data, scoped, matches]);
+
+  function download() {
+    if (!data) return;
+    const pr = data.pressure;
+    const rows = scoped.map((i, k) => {
+      const x = data.reefs[i];
+      return [k + 1, reefName(x).name, x.country, x.lat, x.lon, bleachYears(data.years, i, shift), bleachYears(data.years, i, shift + 0.5), pr.pressure[i], mainPressure(pr, i).label, pr.connect[i]];
+    });
+    const head = ["rank", "reef", "country", "lat", "lon", "bleaching_years_last_10", "bleaching_years_plus_0_5C", "local_pressure_percentile", "main_pressure", "larvae_supply_percentile"];
+    const csv = [head, ...rows].map((r) => r.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(",")).join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.download = `coralytics-restoration-${query.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-") || "world"}${warm ? "-plus-0.5C" : ""}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
 
   const lastYear = data ? data.years.years.length - 1 : 0;
   const year = t ?? lastYear;
@@ -214,6 +248,8 @@ export function Story() {
   const r = data && sel !== null ? data.reefs[sel] : null;
   const y = data?.years;
   const risk = r && y ? y.ann[year * y.n + r.i] / y.scale : 0;
+  const history = useMemo(() => (data && sel !== null ? reefHistory(data.years, sel) : null), [data, sel]);
+  const now = history ? history[year] : null;
   const example = r ? EXAMPLES.find((e) => e.i === r.i) : undefined;
   const scan = r ? scanFor(r) : null;
 
@@ -222,15 +258,21 @@ export function Story() {
       <header className="bar">
         <a className="mark" href="#" onClick={(e) => { e.preventDefault(); choose(null); }}>
           <Mark size={28} />
-          coralitics
+          coralytics
         </a>
         <button className="ghost" onClick={() => about.current?.showModal()}>How it works</button>
       </header>
 
       <main className="body">
         <section className="stage" data-reef={r !== null} data-view={view}>
-          {data && <ReefMap reefs={data.reefs} verdicts={verdicts} projects={r ? NO_PROJECTS : data.projects} selected={sel} compact={r !== null} onPick={choose} />}
+          {data && <ReefMap reefs={data.reefs} verdicts={verdicts} projects={r ? NO_PROJECTS : data.projects} selected={sel} focus={focus} compact={r !== null} onPick={choose} />}
           {!data && !failed && <div className="stage-wait">Loading 18,445 reefs</div>}
+          {data && !r && (
+            <ul className="maplegend" aria-label="Map legend">
+              {(["holds", "savable", "beyond"] as const).map((k) => <li key={k}><span className="dot" style={{ background: VERDICT_COLOR[k] }} />{VERDICT[k].short}</li>)}
+              <li><span className="ring" />Restoration project</li>
+            </ul>
+          )}
           {r && (
             <div className="specimen">
               <div className="seg" role="group" aria-label="View">
@@ -241,15 +283,27 @@ export function Story() {
               {view === "partner" && example?.scan ? (
                 <iframe className="scan" src={example.scan} title="Gaussian splat of a Mars-restored reef in Indonesia" allow="fullscreen; xr-spatial-tracking" />
               ) : view === "scan" ? (
-                <ScanScene url={`${import.meta.env.BASE_URL}${scan!.file}`} risk={risk} label={`Real reef scan coloured by ${reefName(r).name}'s ${Math.round(risk * 100)}% bleaching risk in ${y!.years[year]}`} />
+                <ScanScene url={`${import.meta.env.BASE_URL}${scan!.file}`} white={now!.white} dead={now!.dead} label={`Real reef scan coloured by ${reefName(r).name}'s ${Math.round(risk * 100)}% bleaching risk in ${y!.years[year]}`} />
               ) : habitat?.i === r.i ? (
                 <ReefScene seed={r.i} mix={habitat.mix ?? DEFAULT_MIX} taxa={taxaFor(r)} risk={risk} depth={depth?.i === r.i ? depth.d.median ?? null : null} label={`Reconstructed reef patch for ${reefName(r).name} in ${y!.years[year]}, at ${Math.round(risk * 100)}% bleaching risk`} />
               ) : (
                 <div className="stage-wait light">Mapping this reef from satellite</div>
               )}
-              {view !== "partner" && <div className="specimen-year num" aria-live="polite">{y!.years[year]}</div>}
+              {view !== "partner" && (
+                <div className="specimen-year" aria-live="polite">
+                  <span className="num">{y!.years[year]}</span>
+                  {view === "scan" && <span className="left num">{Math.round(now!.left * 100)}% of coral left</span>}
+                </div>
+              )}
+              {view === "scan" && (
+                <ul className="key" aria-label="Legend">
+                  <li><span style={{ background: "linear-gradient(135deg, #2fb6c4, #9a6235)" }} />Living, as scanned</li>
+                  <li><span style={{ background: BLEACHED }} />Bleached this year</li>
+                  <li><span style={{ background: DEAD }} />Dead, overgrown by algae</li>
+                </ul>
+              )}
               {view === "partner" && <p className="specimen-note">Real 3D scan of a reef in Indonesia restored by Mars. Data: J. Stratford, B. Williams, A. Dwiyanto, Mars Coral Restoration Project, T.B. Razak, T.A.C. Lamont.</p>}
-              {view === "scan" && <p className="specimen-note">{scan!.km < 60 ? `Real 3D scan from ${scan!.place}` : `Real 3D scan from ${scan!.place}, the nearest open scan, ${scan!.km.toLocaleString("en-GB")} km away`} ({scan!.credit}, CC BY 4.0). Corals turn white with this reef's predicted risk.</p>}
+              {view === "scan" && <p className="specimen-note">{scan!.km < 60 ? `Real 3D scan from ${scan!.place}` : `Real 3D scan from ${scan!.place}, the nearest open scan, ${scan!.km.toLocaleString("en-GB")} km away`} ({scan!.credit}, CC BY 4.0). Colours follow the model's heat risk for this reef each year.</p>}
               {view === "rebuilt" && <p className="specimen-note">Rebuilt from this reef's satellite habitat map (Allen Coral Atlas), with Smithsonian scans of {r.realm === "Tropical Atlantic" ? "Caribbean" : "Indo-Pacific"} corals. Colour follows the model's risk.</p>}
             </div>
           )}
@@ -273,63 +327,54 @@ export function Story() {
 
           {data && !r && (
             <>
-              <h1>Which reefs are worth restoring?</h1>
-              <p className="lede">Coral planted where the water gets too hot dies, and the money goes with it. We trained a model on 40 years of ocean temperature and 17,000 diver surveys to tell the reefs apart.</p>
-              <WorldStrip y={data.years} />
-              <div className="shares">
-                {(["holds", "savable", "beyond"] as const).map((k) => (
-                  <div key={k} className="share">
-                    <div className="share-n num"><NumberFlow value={Math.round(shares[k] * 100)} suffix="%" /></div>
-                    <div className="share-l"><span className="dot" style={{ background: VERDICT_COLOR[k] }} />{VERDICT[k].short}</div>
-                  </div>
-                ))}
-              </div>
+              <h1>Find reefs worth restoring</h1>
+              <p className="lede">Every reef scored on how often heat bleaches it, whether heat-tolerant coral would hold, and what else stops it recovering.</p>
+              <label className="search">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.6" fill="none" /><path d="m10.5 10.5 3 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+                <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search a country or reef region" aria-label="Search a country or reef region" />
+              </label>
               <Warm warm={warm} setWarm={setWarm} />
-              <div className="projects">
-                <h2>Where restoration happens today</h2>
-                <p className="projects-lede"><span className="ring" aria-hidden="true" />{data.projects.length} restoration projects from a global review (Boström-Einarsson et al. 2020). Not one named heat as a reason for its site.</p>
-                <div className="projects-n">
-                  <span className="num" style={{ color: VERDICT_COLOR.beyond }}><NumberFlow value={Math.round((projectShares.beyond / Math.max(1, data.projects.length)) * 100)} suffix="%" /></span>
-                  <span>are on reefs too hot to save{warm ? " with 0.5 °C more warming" : " today"}.{warm ? "" : " Turn on warming above."}</span>
+              <div className="triage" role="img" aria-label={`${shares.n} reefs: ${Math.round(shares.holds * 100)}% hold, ${Math.round(shares.savable * 100)}% need tougher coral, ${Math.round(shares.beyond * 100)}% too hot`}>
+                <div className="triage-bar">
+                  {(["holds", "savable", "beyond"] as const).map((k) => <span key={k} style={{ flexGrow: shares[k], background: VERDICT_COLOR[k] }} />)}
                 </div>
+                <ul>
+                  {(["holds", "savable", "beyond"] as const).map((k) => (
+                    <li key={k}><span className="num"><NumberFlow value={Math.round(shares[k] * 100)} suffix="%" /></span><span><span className="dot" style={{ background: VERDICT_COLOR[k] }} />{VERDICT[k].short}</span></li>
+                  ))}
+                </ul>
+                <p className="fine">{shares.n.toLocaleString("en-GB")} reefs{matches ? ` matching "${query.trim()}"` : " worldwide"}{warm ? ", with 0.5 °C more warming" : ""}.</p>
               </div>
-              <h2>Best places to restore</h2>
-              <p className="fine sub">Reefs that need help, would hold with heat-tolerant coral, and face the least local pressure.</p>
+              <div className="listhead">
+                <h2>Best places to restore{matches ? ` in "${query.trim()}"` : ""}</h2>
+                {scoped.length > 0 && <button className="ghost small" onClick={download}>Download {scoped.length.toLocaleString("en-GB")} as CSV</button>}
+              </div>
+              {shortlist.length === 0 && <p className="fine">No reef here needs heat-tolerant coral{warm ? "" : " today"}. Try turning on warming, or another search.</p>}
               <ul className="list">
-                {bestBets.map((i, k) => {
+                {shortlist.map((i, k) => {
                   const n = reefName(data.reefs[i]);
+                  if (shortlist.some((j) => j !== i && data.reefs[j].eco === data.reefs[i].eco)) n.place = `${n.place} · ${coords(data.reefs[i])}`;
                   return (
                     <li key={i}>
                       <button className="item" onClick={() => choose(i)}>
                         <span className="rank num">{k + 1}</span>
                         <span className="grow"><span className="item-name">{n.name}</span><span className="item-place">{n.place}</span></span>
-                        <span className="tag">{band(data.pressure.connect[i], ["Few larvae", "Some larvae", "Many larvae"])}</span>
+                        <span className="cols num"><span>{bleachYears(data.years, i, shift)}/10</span><span>{band(data.pressure.pressure[i], ["Low", "Mid", "High"])}</span></span>
                       </button>
                     </li>
                   );
                 })}
               </ul>
-              <h2>Try a reef</h2>
-              <ul className="list">
-                {EXAMPLES.map((e) => {
-                  const v = verdicts[e.i];
-                  return (
-                    <li key={e.i}>
-                      <button className="item" onClick={() => choose(e.i)}>
-                        <span><span className="item-name">{e.name}</span><span className="item-place">{e.place}</span></span>
-                        <span className="tag"><span className="dot" style={{ background: VERDICT_COLOR[v] }} />{VERDICT[v].short}</span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-              <p className="fine">Or click any dot on the map. Each one is 5 km of reef.</p>
-              <p className="proof"><span className="proof-n num">0.84</span><span>Accuracy (AUROC) on 201 bleaching surveys from 2021 to 2025 that the model never saw, in 10 countries (MERMAID).</span></p>
+              {shortlist.length > 0 && <p className="fine">Reefs that bleach too often today but would hold with coral 0.5 °C tougher, ranked by local pressure and larvae from nearby reefs. Columns: bleaching years in the last 10, local pressure.</p>}
+              <div className="chips">
+                <span>Examples</span>
+                {EXAMPLES.map((e) => <button key={e.i} onClick={() => choose(e.i)}>{e.name}</button>)}
+              </div>
             </>
           )}
 
           {data && r && y && (
-            <ReefPanel pressure={data.pressure} rank={ranking.rank.get(r.i)} ranked={ranking.order.length} example={example} depth={depth?.i === r.i ? depth.d : undefined} mix={habitat?.i === r.i ? habitat.mix : undefined} r={r} y={y} verdict={verdicts[r.i]} shift={shift} year={year} setYear={(k) => { setPlaying(false); setT(k); }} playing={playing} play={play} warm={warm} setWarm={setWarm} back={() => choose(null)} />
+            <ReefPanel history={history!} pressure={data.pressure} rank={ranking.rank.get(r.i)} ranked={ranking.order.length} example={example} depth={depth?.i === r.i ? depth.d : undefined} mix={habitat?.i === r.i ? habitat.mix : undefined} r={r} y={y} verdict={verdicts[r.i]} shift={shift} year={year} setYear={(k) => { setPlaying(false); setT(k); }} playing={playing} play={play} warm={warm} setWarm={setWarm} back={() => choose(null)} />
           )}
         </aside>
       </main>
@@ -346,6 +391,8 @@ export function Story() {
             <dd>MERMAID, WCS's open reef survey platform, holds 201 bleaching surveys from 2021 to 2025 in 10 countries, all after our training data ends. The model ranks them at 0.84 AUROC for 30% or more of corals bleached.</dd>
             <dt>What protection is worth</dt>
             <dd>In 3,385 MERMAID coral surveys, compared within the same country, each bleaching year in the past decade went with 1.9 fewer points of hard coral cover. No-take reserves held 3.2 more points and about twice the fish. So a reserve is worth roughly 1.7 bleaching years. This is an association across sites, not a controlled trial.</dd>
+            <dt>Bleached, then dead</dt>
+            <dd>Bleached coral is alive but starving. In the scene, about 40% of the coral that bleaches in a year dies and is overgrown by algae; the rest regains its colour. Dead patches regrow at about 14% a year, so a reef takes 10 to 15 years to come back (Hughes et al. 2018). "Coral left" is this illustration, not a survey.</dd>
             <dt>A bleaching year</dt>
             <dd>A year in which the model put the reef past 50% risk at its hottest month. Fast-growing corals need 10 to 15 years to recover (Hughes et al. 2018), so a reef holds if this happens 2 or fewer years in 10.</dd>
             <dt>Depth</dt>
@@ -359,7 +406,7 @@ export function Story() {
             <dt>Limits and safeguards</dt>
             <dd>Surveys are densest in Australia, the Caribbean and Southeast Asia, so the model is least sure elsewhere. It shows where heat makes restoration hard. It does not decide for the people who depend on a reef. A reef marked too hot still needs protection, and the call stays with local communities. Heat-tolerant coral from breeding or assisted gene flow can cut genetic diversity, so sourcing stays local and is monitored. Code and data are open so anyone can check the numbers.</dd>
             <dt>Open source</dt>
-            <dd>Coralitics is an open, community-led tool. The model, the data joins and this map are public, built only on open data. Restoration teams and divers can add their own surveys, which retrain the model and make it surer where it is weakest today.</dd>
+            <dd>Coralytics is an open, community-led tool. The model, the data joins and this map are public, built only on open data. Restoration teams and divers can add their own surveys, which retrain the model and make it surer where it is weakest today.</dd>
             <dt>The reef you see</dt>
             <dd>Real 3D scans of reefs, all CC BY 4.0: Soneva and Wildflow's Gaussian splats of Maldives restoration plots, the Galapagos_3D survey (Yuval, Keith et al.), and diver photogrammetry from the Great Barrier Reef, Belize, the US Virgin Islands, Okinawa, Hawaii, Mayotte and Thailand shared on Sketchfab. Each reef shows the nearest scan. Each year, colourful living tissue turns white in colony-sized patches as the model's risk for that reef rises. "From satellite" instead rebuilds the reef from its Allen Coral Atlas habitat map with Smithsonian coral scans (CC0).</dd>
           </dl>
@@ -383,35 +430,7 @@ function Warm({ warm, setWarm }: { warm: boolean; setWarm: (v: boolean) => void 
   );
 }
 
-function WorldStrip({ y }: { y: Years }) {
-  const share = useMemo(
-    () =>
-      y.years.map((_, t) => {
-        let c = 0;
-        for (let k = 0; k < y.n; k++) if (y.ann[t * y.n + k] >= y.scale / 2) c++;
-        return c / y.n;
-      }),
-    [y],
-  );
-  const peak = share.reduce((a, v, k) => (v > share[a] ? k : a), 0);
-  const early = share.slice(0, 10).reduce((a, v) => a + v, 0) / 10;
-  return (
-    <figure className="world">
-      <div className="world-head">
-        <span className="world-n num">{Math.round(share[peak] * 100)}%</span>
-        <span>of the world's reefs were hot enough to bleach in {y.years[peak]}. In {y.years[0]} to {y.years[9]} it was about {Math.round(early * 100)}% a year.</span>
-      </div>
-      <div className="world-bars" role="img" aria-label={`Share of reefs in a bleaching year, ${y.years[0]} to ${y.years[y.years.length - 1]}`}>
-        {share.map((v, k) => (
-          <span key={y.years[k]} title={`${y.years[k]}: ${Math.round(v * 100)}%`} data-hot={v >= 0.4} style={{ height: `${Math.max(4, v * 100)}%` }} />
-        ))}
-      </div>
-      <div className="world-axis num" aria-hidden="true"><span>{y.years[0]}</span><span>{y.years[y.years.length - 1]}</span></div>
-    </figure>
-  );
-}
-
-function ReefPanel(p: { pressure: Pressure; rank: number | undefined; ranked: number; example: Example | undefined; depth: Depth | undefined; mix: Mix | null | undefined; r: Reef; y: Years; verdict: Triage; shift: number; year: number; setYear: (k: number) => void; playing: boolean; play: () => void; warm: boolean; setWarm: (v: boolean) => void; back: () => void }) {
+function ReefPanel(p: { history: ReefYear[]; pressure: Pressure; rank: number | undefined; ranked: number; example: Example | undefined; depth: Depth | undefined; mix: Mix | null | undefined; r: Reef; y: Years; verdict: Triage; shift: number; year: number; setYear: (k: number) => void; playing: boolean; play: () => void; warm: boolean; setWarm: (v: boolean) => void; back: () => void }) {
   const { r, y } = p;
   const name = reefName(r);
   const now = bleachYears(y, r.i, p.shift);
@@ -445,13 +464,14 @@ function ReefPanel(p: { pressure: Pressure; rank: number | undefined; ranked: nu
         <div className="strip" role="group" aria-label="Choose a year">
           {y.years.map((yr, k) => {
             const risk = y.ann[k * y.n + r.i] / y.scale;
+            const h = p.history[k];
             return (
               <button
                 key={yr}
                 className="tile"
                 aria-pressed={k === p.year}
-                aria-label={`${yr}: ${Math.round(risk * 100)}% bleaching risk`}
-                style={{ background: tileColor(risk) }}
+                aria-label={`${yr}: ${Math.round(risk * 100)}% heat risk, ${Math.round(h.left * 100)}% of coral left`}
+                style={{ background: coverBar(h) }}
                 onClick={() => p.setYear(k)}
               />
             );
@@ -460,7 +480,7 @@ function ReefPanel(p: { pressure: Pressure; rank: number | undefined; ranked: nu
         <div className="strip-axis num" aria-hidden="true">
           {y.years.map((yr, k) => (yr % 10 === 0 ? <span key={yr} style={{ gridColumn: `${k + 1} / span 6` }}>{yr}</span> : null))}
         </div>
-        <p className="fine">Brown is healthy. White is a year the model put this reef past 50% bleaching risk. {y.years[p.year]}: {Math.round((y.ann[p.year * y.n + r.i] / y.scale) * 100)}% risk.</p>
+        <p className="fine">Each bar is the reef that year: <b style={{ color: LIVING }}>living coral</b>, <b>bleached</b>, and <b style={{ color: DEAD }}>dead</b>. Coral that dies takes 10 to 15 years to grow back, so bleaching years stack up. {y.years[p.year]}: {Math.round((y.ann[p.year * y.n + r.i] / y.scale) * 100)}% heat risk, {Math.round(p.history[p.year].left * 100)}% of coral left.</p>
       </div>
 
       <Warm warm={p.warm} setWarm={p.setWarm} />

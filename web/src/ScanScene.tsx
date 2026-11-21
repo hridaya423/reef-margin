@@ -20,17 +20,10 @@ const BLEACH_GLSL = `
   }
 `;
 
-const bleachAmount = (risk: number) => {
-  const x = Math.min(1, Math.max(0, (risk - 0.25) / 0.45));
-  return x * x * (3 - 2 * x);
-};
-
-export function ScanScene({ url, risk, label }: { url: string; risk: number; label: string }) {
+export function ScanScene({ url, white, dead, label }: { url: string; white: number; dead: number; label: string }) {
   const host = useRef<HTMLDivElement>(null);
-  const bleach = useRef<{ value: number } | null>(null);
-  const mesh = useRef<SplatMesh | null>(null);
-  const target = useRef(bleachAmount(risk));
-  target.current = bleachAmount(risk);
+  const target = useRef({ white, dead });
+  target.current = { white, dead };
 
   useEffect(() => {
     const el = host.current!;
@@ -43,8 +36,8 @@ export function ScanScene({ url, risk, label }: { url: string; risk: number; lab
     const camera = new THREE.PerspectiveCamera(42, 1, 0.05, 200);
     camera.position.set(0, 3.6, 6.2);
 
-    const uBleach = dyno.dynoFloat(target.current);
-    bleach.current = uBleach;
+    const uWhite = dyno.dynoFloat(target.current.white);
+    const uDead = dyno.dynoFloat(target.current.dead);
     const splats = new SplatMesh({
       url,
       onLoad: () => {
@@ -53,7 +46,7 @@ export function ScanScene({ url, risk, label }: { url: string; risk: number; lab
     });
     splats.objectModifier = dyno.dynoBlock({ gsplat: dyno.Gsplat }, { gsplat: dyno.Gsplat }, ({ gsplat }) => {
       const block = new dyno.Dyno({
-        inTypes: { gsplat: dyno.Gsplat, bleach: "float" },
+        inTypes: { gsplat: dyno.Gsplat, white: "float", dead: "float" },
         outTypes: { gsplat: dyno.Gsplat },
         globals: () => [BLEACH_GLSL],
         statements: ({ inputs, outputs }) =>
@@ -65,17 +58,20 @@ export function ScanScene({ url, risk, label }: { url: string; risk: number; lab
             float lo = min(c.r, min(c.g, c.b));
             float lum = dot(c, vec3(0.299, 0.587, 0.114));
             float living = smoothstep(0.04, 0.16, hi - lo) * (1.0 - smoothstep(0.62, 0.85, lum)) * smoothstep(0.05, 0.35, p.y);
-            float colony = scanNoise(p * 2.6) * 0.75 + scanNoise(p * 9.0) * 0.25;
-            float hit = smoothstep(colony - 0.06, colony + 0.06, ${inputs.bleach} * 1.12 - 0.04);
-            vec3 white = vec3(0.97, 0.96, 0.93) * (0.62 + 0.55 * lum);
-            ${outputs.gsplat}.rgba.rgb = mix(c, white, living * hit);
+            float colony = smoothstep(0.18, 0.82, scanNoise(p * 2.6) * 0.75 + scanNoise(p * 9.0) * 0.25);
+            float isDead = 1.0 - smoothstep(${inputs.dead} - 0.03, ${inputs.dead} + 0.03, colony);
+            float isWhite = (1.0 - smoothstep(${inputs.dead} + ${inputs.white} - 0.03, ${inputs.dead} + ${inputs.white} + 0.03, colony)) * (1.0 - isDead);
+            vec3 bleached = vec3(0.97, 0.96, 0.93) * (0.62 + 0.55 * lum);
+            vec3 algae = mix(vec3(0.33, 0.38, 0.29) * (0.6 + 0.6 * lum), vec3(0.3), 0.2);
+            vec3 outc = mix(c, bleached, isWhite);
+            outc = mix(outc, algae, isDead);
+            ${outputs.gsplat}.rgba.rgb = mix(c, outc, living);
           `),
       });
-      return { gsplat: block.apply({ gsplat, bleach: uBleach }).gsplat };
+      return { gsplat: block.apply({ gsplat, white: uWhite, dead: uDead }).gsplat };
     });
     splats.updateGenerator();
     scene.add(splats);
-    mesh.current = splats;
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 0.2, 0.6);
@@ -108,9 +104,11 @@ export function ScanScene({ url, risk, label }: { url: string; risk: number; lab
       const now = performance.now();
       const k = 1 - Math.exp(-(now - last) / 220);
       last = now;
-      const next = uBleach.value + (target.current - uBleach.value) * k;
-      if (Math.abs(next - uBleach.value) > 0.0005) {
-        uBleach.value = next;
+      const w = uWhite.value + (target.current.white - uWhite.value) * k;
+      const d = uDead.value + (target.current.dead - uDead.value) * k;
+      if (Math.abs(w - uWhite.value) + Math.abs(d - uDead.value) > 0.0005) {
+        uWhite.value = w;
+        uDead.value = d;
         splats.updateVersion();
       }
       controls.update();

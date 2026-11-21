@@ -18,7 +18,6 @@ export const SCANS: Scan[] = [
   { file: "scans/sf_belize.splat", place: "South Water Caye, Belize", lat: 16.8, lon: -88.08, credit: "Ben M. Ritt" },
   { file: "scans/sf_usvi2016.splat", place: "Flat Key, US Virgin Islands", lat: 18.32, lon: -64.85, credit: "Lauren Olinger" },
   { file: "scans/sf_okinawa.splat", place: "Sakimotobu, Okinawa", lat: 26.69, lon: 127.88, credit: "yuma.jp" },
-  { file: "scans/sf_maui.splat", place: "Maui, Hawaii", lat: 20.8, lon: -156.5, credit: "Reverse Imagineering" },
   { file: "scans/sf_mayotte.splat", place: "Îlots Choisils, Mayotte", lat: -12.65, lon: 45.1, credit: "DroneGo" },
   { file: "scans/sf_thailand.splat", place: "Ko Pha-ngan, Thailand", lat: 9.75, lon: 100.05, credit: "QQman" },
 ];

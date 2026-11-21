@@ -6,9 +6,9 @@ const STYLE = "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style
 export const VERDICT_COLOR = { holds: "#1e8e4a", savable: "#c27a00", beyond: "#d93636" } as const;
 
 export type Project = [lat: number, lon: number, cell: number, place: string];
-type Props = { reefs: Reef[]; verdicts: string[]; projects: Project[]; selected: number | null; compact: boolean; onPick: (i: number) => void };
+type Props = { reefs: Reef[]; verdicts: string[]; projects: Project[]; selected: number | null; focus: [number, number, number, number] | null; compact: boolean; onPick: (i: number) => void };
 
-export function ReefMap({ reefs, verdicts, projects, selected, compact, onPick }: Props) {
+export function ReefMap({ reefs, verdicts, projects, selected, focus, compact, onPick }: Props) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<MLMap | null>(null);
   const [ready, setReady] = useState(false);
@@ -100,6 +100,14 @@ export function ReefMap({ reefs, verdicts, projects, selected, compact, onPick }
       m.flyTo({ center: [r.lon, r.lat], zoom: compact ? 4 : 6, duration: reduce ? 0 : 1200 });
     }
   }, [ready, selected, compact, reefs]);
+
+  useEffect(() => {
+    if (!ready || selected !== null) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const m = map.current!;
+    if (focus) m.fitBounds(focus, { padding: 60, maxZoom: 6, duration: reduce ? 0 : 1000 });
+    else m.flyTo({ center: [150, -5], zoom: 1.6, duration: reduce ? 0 : 1000 });
+  }, [ready, focus, selected]);
 
   return <div ref={el} className="reefmap" role="application" aria-label="World map of coral reefs, coloured by verdict" />;
 }

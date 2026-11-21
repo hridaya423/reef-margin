@@ -12,7 +12,7 @@ from sklearn.metrics import roc_auc_score
 API = os.environ.get("REEF_API", "https://hridayahoney--reef-response-api-web.us-east.modal.run")
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 RAW = os.path.join(ROOT, "data/mermaid/summarysampleevents.json")
-UA = {"User-Agent": "coralitics/0.1 (research prototype)"}
+UA = {"User-Agent": "coralytics/0.1 (research prototype)"}
 
 
 def fetch():
