@@ -193,3 +193,19 @@ h1, h2 { margin: 0; letter-spacing: -0.01em; }
 .key li { display: flex; align-items: center; gap: 8px; }
 .key span { width: 10px; height: 10px; border-radius: 3px; box-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.5); }
 @media (max-width: 960px) { .key { top: 56px; left: 12px; } .maplegend { left: 8px; bottom: 40px; } }
+.tolerance { margin-top: 28px; }
+.tol-bars { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 12px; }
+.tol { display: flex; flex-direction: column; align-items: stretch; gap: 4px; border: 0; background: none; padding: 4px 2px; border-radius: 10px; cursor: pointer; color: var(--fg-3); font: inherit; transition: background-color 160ms var(--ease); }
+.tol:hover:not(:disabled) { background: var(--surface); }
+.tol:disabled { cursor: default; }
+.tol:focus-visible { outline: 2px solid var(--accent-line); outline-offset: 2px; }
+.tol-pct { font-size: 12px; line-height: 16px; text-align: center; }
+.tol-bar { position: relative; height: 56px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+.tol-bar span { position: absolute; left: 0; right: 0; bottom: 0; background: #1e8e4a; opacity: 0.35; transition: height 480ms var(--ease), opacity 160ms var(--ease); }
+.tol:disabled .tol-bar span { background: var(--control); }
+.tol[aria-pressed="true"] .tol-bar span { opacity: 1; }
+.tol[aria-pressed="true"] { color: var(--fg); font-weight: 600; }
+.tol-x { font-size: 12px; line-height: 16px; text-align: center; white-space: nowrap; }
+.need { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.need-n { margin-top: 4px; font-size: 32px; line-height: 38px; font-weight: 600; letter-spacing: -0.02em; }
+.need .fine { margin-top: 4px; font-size: 13px; line-height: 18px; color: var(--fg-2); }

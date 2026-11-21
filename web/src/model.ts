@@ -51,7 +51,7 @@ export function triageYears(y: Years, k: number, warming: number, gain: number):
 }
 
 export function gainNeeded(y: Years, k: number, warming: number) {
-  for (let g = 0; g <= 1.5 + 1e-9; g += 0.25) if (bleachYears(y, k, warming - g) <= HOLD_MAX) return g;
+  for (let g = 0; warming - g >= y.shifts[0] - 1e-9; g += 0.25) if (bleachYears(y, k, warming - g) <= HOLD_MAX) return g;
   return null;
 }
 

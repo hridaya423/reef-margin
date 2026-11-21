@@ -2,19 +2,27 @@ import NumberFlow from "@number-flow/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getDepth, getHabitat, getLayer, getYears, type Depth, type Habitat, type Reef, type Years } from "./api";
 import { ATLANTIC, PACIFIC, ReefScene, type Mix, type Taxon } from "./ReefScene";
-import { bleachYears, decadeCount, HOLD_MAX, type ReefYear, reefHistory, triageYears, type Triage } from "./model";
+import { bleachYears, decadeCount, gainNeeded, HOLD_MAX, type ReefYear, reefHistory, triageYears, type Triage } from "./model";
 import { ReefMap, VERDICT_COLOR, type Project } from "./ReefMap";
 import { Mark } from "./Mark";
 import { ScanScene } from "./ScanScene";
 import { scanFor } from "./scans";
 
-const GAIN = 0.5;
+const GAINS = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5];
+const gainText = (g: number) => `+${g} °C`;
 
-const VERDICT: Record<Triage, { title: string; line: string; short: string }> = {
-  holds: { title: "Holds on its own", line: "Bleaching-level heat hit it 2 or fewer years in 10. Corals here have time to recover.", short: "Holds on its own" },
-  savable: { title: "Restore with heat-tolerant coral", line: "It bleaches too often for today's coral, but coral half a degree tougher would hold.", short: "Needs tougher coral" },
-  beyond: { title: "Too hot for today's restoration", line: "Even coral half a degree tougher would bleach too often. Money planted here is likely lost.", short: "Too hot to save" },
+const VERDICT: Record<Triage, { title: string; short: string }> = {
+  holds: { title: "Holds on its own", short: "Holds on its own" },
+  savable: { title: "Restore with heat-tolerant coral", short: "Needs tougher coral" },
+  beyond: { title: "Too hot for today's restoration", short: "Too hot to save" },
 };
+
+const verdictLine = (v: Triage, g: number) =>
+  v === "holds"
+    ? "Bleaching-level heat hit it 2 or fewer years in 10. Corals here have time to recover."
+    : v === "savable"
+      ? `It bleaches too often for today's coral, but coral bred to handle water ${g} °C warmer would hold.`
+      : `Even coral bred to handle water ${g} °C warmer would bleach too often. Money planted here is likely lost.`;
 
 type View = "scan" | "rebuilt" | "partner";
 
@@ -96,6 +104,7 @@ export function Story() {
   const [attempt, setAttempt] = useState(0);
   const [sel, setSel] = useState<number | null>(readReef);
   const [warm, setWarm] = useState(false);
+  const [gain, setGain] = useState(0.5);
   const [t, setT] = useState<number | null>(null);
   const [playing, setPlaying] = useState(false);
   const about = useRef<HTMLDialogElement>(null);
@@ -133,7 +142,7 @@ export function Story() {
   }, [data, sel]);
 
   const shift = warm ? 0.5 : 0;
-  const verdicts = useMemo(() => (data ? data.reefs.map((_, k) => triageYears(data.years, k, shift, GAIN)) : []), [data, shift]);
+  const verdicts = useMemo(() => (data ? data.reefs.map((_, k) => triageYears(data.years, k, shift, gain)) : []), [data, shift, gain]);
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!data || q.length < 2) return null;
@@ -151,6 +160,20 @@ export function Story() {
     const d = Math.max(n, 1);
     return { n, holds: c.holds / d, savable: c.savable / d, beyond: c.beyond / d };
   }, [verdicts, matches]);
+
+  const curve = useMemo(() => {
+    if (!data) return GAINS.map(() => 0);
+    const hold = GAINS.map(() => 0);
+    let n = 0;
+    for (const x of data.reefs) {
+      if (matches && !matches.has(x.i)) continue;
+      n++;
+      GAINS.forEach((g, k) => {
+        if (bleachYears(data.years, x.i, shift - g) <= HOLD_MAX) hold[k]++;
+      });
+    }
+    return hold.map((h) => h / Math.max(n, 1));
+  }, [data, matches, shift]);
 
   const ranking = useMemo(() => {
     if (!data) return { order: [] as number[], rank: new Map<number, number>() };
@@ -191,13 +214,13 @@ export function Story() {
     const pr = data.pressure;
     const rows = scoped.map((i, k) => {
       const x = data.reefs[i];
-      return [k + 1, reefName(x).name, x.country, x.lat, x.lon, bleachYears(data.years, i, shift), bleachYears(data.years, i, shift + 0.5), pr.pressure[i], mainPressure(pr, i).label, pr.connect[i]];
+      return [k + 1, reefName(x).name, x.country, x.lat, x.lon, bleachYears(data.years, i, shift), bleachYears(data.years, i, shift + 0.5), gainNeeded(data.years, i, shift) ?? "", pr.pressure[i], mainPressure(pr, i).label, pr.connect[i]];
     });
-    const head = ["rank", "reef", "country", "lat", "lon", "bleaching_years_last_10", "bleaching_years_plus_0_5C", "local_pressure_percentile", "main_pressure", "larvae_supply_percentile"];
+    const head = ["rank", "reef", "country", "lat", "lon", "bleaching_years_last_10", "bleaching_years_plus_0_5C", "heat_tolerance_needed_C", "local_pressure_percentile", "main_pressure", "larvae_supply_percentile"];
     const csv = [head, ...rows].map((r) => r.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(",")).join("\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    a.download = `coralytics-restoration-${query.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-") || "world"}${warm ? "-plus-0.5C" : ""}.csv`;
+    a.download = `coralytics-restoration-${query.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-") || "world"}${warm ? "-plus-0.5C" : ""}-coral-plus-${gain}C.csv`;
     a.click();
     URL.revokeObjectURL(a.href);
   }
@@ -345,6 +368,7 @@ export function Story() {
                 </ul>
                 <p className="fine">{shares.n.toLocaleString("en-GB")} reefs{matches ? ` matching "${query.trim()}"` : " worldwide"}{warm ? ", with 0.5 °C more warming" : ""}.</p>
               </div>
+              <Tolerance curve={curve} gain={gain} setGain={setGain} />
               <div className="listhead">
                 <h2>Best places to restore{matches ? ` in "${query.trim()}"` : ""}</h2>
                 {scoped.length > 0 && <button className="ghost small" onClick={download}>Download {scoped.length.toLocaleString("en-GB")} as CSV</button>}
@@ -365,7 +389,7 @@ export function Story() {
                   );
                 })}
               </ul>
-              {shortlist.length > 0 && <p className="fine">Reefs that bleach too often today but would hold with coral 0.5 °C tougher, ranked by local pressure and larvae from nearby reefs. Columns: bleaching years in the last 10, local pressure.</p>}
+              {shortlist.length > 0 && <p className="fine">Reefs that bleach too often today but would hold with coral bred {gainText(gain)} tougher, ranked by local pressure and larvae from nearby reefs. Columns: bleaching years in the last 10, local pressure.</p>}
               <div className="chips">
                 <span>Examples</span>
                 {EXAMPLES.map((e) => <button key={e.i} onClick={() => choose(e.i)}>{e.name}</button>)}
@@ -374,7 +398,7 @@ export function Story() {
           )}
 
           {data && r && y && (
-            <ReefPanel history={history!} pressure={data.pressure} rank={ranking.rank.get(r.i)} ranked={ranking.order.length} example={example} depth={depth?.i === r.i ? depth.d : undefined} mix={habitat?.i === r.i ? habitat.mix : undefined} r={r} y={y} verdict={verdicts[r.i]} shift={shift} year={year} setYear={(k) => { setPlaying(false); setT(k); }} playing={playing} play={play} warm={warm} setWarm={setWarm} back={() => choose(null)} />
+            <ReefPanel history={history!} pressure={data.pressure} rank={ranking.rank.get(r.i)} ranked={ranking.order.length} example={example} depth={depth?.i === r.i ? depth.d : undefined} mix={habitat?.i === r.i ? habitat.mix : undefined} r={r} y={y} verdict={verdicts[r.i]} gain={gain} shift={shift} year={year} setYear={(k) => { setPlaying(false); setT(k); }} playing={playing} play={play} warm={warm} setWarm={setWarm} back={() => choose(null)} />
           )}
         </aside>
       </main>
@@ -398,7 +422,9 @@ export function Story() {
             <dt>Depth</dt>
             <dd>From the sharpest open survey that covers the reef: NOAA's 3 m depth models for US reefs, Digital Earth Pacific's 10 m satellite depth for Pacific islands, and Geoscience Australia's 30 m model for the Great Barrier Reef. Deeper reefs are shown darker and bluer. Depth is not a model input.</dd>
             <dt>Heat-tolerant coral</dt>
-            <dd>Selective breeding and assisted gene flow aim to give corals more heat tolerance. We model a gain of 0.5 °C as the same reef in cooler water.</dd>
+            <dd>Selective breeding and assisted gene flow aim to give corals more heat tolerance. We model a gain of X °C as the same reef in water X °C cooler, and you choose X. Breeding is real but slow: one generation of selection adds about 1 °C-week of tolerance (Humanes et al. 2024, Nature Communications), and a 0.5 °C warmer heatwave adds several °C-weeks. So +0.5 °C is several generations of breeding, not one. "Heat tolerance needed" tells a breeding program the target for each reef.</dd>
+            <dt>Future warming</dt>
+            <dd>The world is warming about 0.27 °C a decade (Forster et al. 2025, Indicators of Global Climate Change). At that rate, 0.5 °C more arrives around 2040. Tropical seas warm a little more slowly, so this is an early estimate.</dd>
             <dt>Restoration projects</dt>
             <dd>The 304 projects in Boström-Einarsson et al. (2020, PLoS ONE, data on Dryad). 224 sit within 25 km of a reef we score. The review records why each site was chosen: an existing restoration site, a disturbance, logistics or "favourable conditions". None names heat or bleaching. With 0.5 °C more warming, 66% of these projects would sit on reefs too hot for today's coral.</dd>
             <dt>Will it recover?</dt>
@@ -408,7 +434,7 @@ export function Story() {
             <dt>Open source</dt>
             <dd>Coralytics is an open, community-led tool. The model, the data joins and this map are public, built only on open data. Restoration teams and divers can add their own surveys, which retrain the model and make it surer where it is weakest today.</dd>
             <dt>The reef you see</dt>
-            <dd>Real 3D scans of reefs, all CC BY 4.0: Soneva and Wildflow's Gaussian splats of Maldives restoration plots, the Galapagos_3D survey (Yuval, Keith et al.), and diver photogrammetry from the Great Barrier Reef, Belize, the US Virgin Islands, Okinawa, Hawaii, Mayotte and Thailand shared on Sketchfab. Each reef shows the nearest scan. Each year, colourful living tissue turns white in colony-sized patches as the model's risk for that reef rises. "From satellite" instead rebuilds the reef from its Allen Coral Atlas habitat map with Smithsonian coral scans (CC0).</dd>
+            <dd>Real 3D scans of reefs, all CC BY 4.0: Soneva and Wildflow's Gaussian splats of Maldives restoration plots, the Galapagos_3D survey (Yuval, Keith et al.), and diver photogrammetry from the Great Barrier Reef, Belize, the US Virgin Islands, Okinawa, Mayotte and Thailand shared on Sketchfab. Each reef shows the nearest scan. Each year, living tissue turns white in colony-sized patches as the model's risk for that reef rises, and some of the bleached coral dies. "From satellite" instead rebuilds the reef from its Allen Coral Atlas habitat map with Smithsonian coral scans (CC0).</dd>
           </dl>
           <div className="about-foot">
             <a href="#classic" onClick={() => window.location.reload()}>Open the full explorer</a>
@@ -420,22 +446,41 @@ export function Story() {
   );
 }
 
+function Tolerance({ curve, gain, setGain }: { curve: number[]; gain: number; setGain: (g: number) => void }) {
+  return (
+    <div className="tolerance">
+      <h2>How much tougher must coral be?</h2>
+      <p className="fine">Share of these reefs that hold if restored coral handles warmer water. Pick a target.</p>
+      <div className="tol-bars" role="group" aria-label="Heat tolerance of restored coral">
+        {GAINS.map((g, k) => (
+          <button key={g} className="tol" aria-pressed={g === gain} disabled={g === 0} onClick={() => setGain(g)} aria-label={`${g === 0 ? "Today's coral" : `Coral ${gainText(g)}`}: ${Math.round(curve[k] * 100)}% of reefs hold`}>
+            <span className="tol-pct num">{Math.round(curve[k] * 100)}%</span>
+            <span className="tol-bar"><span style={{ height: `${curve[k] * 100}%` }} /></span>
+            <span className="tol-x num">{g === 0 ? "Today" : gainText(g)}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Warm({ warm, setWarm }: { warm: boolean; setWarm: (v: boolean) => void }) {
   return (
     <label className="switch">
       <input type="checkbox" role="switch" checked={warm} onChange={(e) => setWarm(e.target.checked)} />
       <span className="track" aria-hidden="true"><span className="thumb" /></span>
-      <span>Add 0.5 °C of future warming</span>
+      <span>Add 0.5 °C of warming, about 2040</span>
     </label>
   );
 }
 
-function ReefPanel(p: { history: ReefYear[]; pressure: Pressure; rank: number | undefined; ranked: number; example: Example | undefined; depth: Depth | undefined; mix: Mix | null | undefined; r: Reef; y: Years; verdict: Triage; shift: number; year: number; setYear: (k: number) => void; playing: boolean; play: () => void; warm: boolean; setWarm: (v: boolean) => void; back: () => void }) {
+function ReefPanel(p: { history: ReefYear[]; pressure: Pressure; rank: number | undefined; ranked: number; example: Example | undefined; depth: Depth | undefined; mix: Mix | null | undefined; r: Reef; y: Years; verdict: Triage; gain: number; shift: number; year: number; setYear: (k: number) => void; playing: boolean; play: () => void; warm: boolean; setWarm: (v: boolean) => void; back: () => void }) {
   const { r, y } = p;
   const name = reefName(r);
   const now = bleachYears(y, r.i, p.shift);
   const before = decadeCount(y, r.i, 1988);
   const v = VERDICT[p.verdict];
+  const need = gainNeeded(y, r.i, p.shift);
   return (
     <>
       <button className="back" onClick={p.back}>
@@ -447,13 +492,19 @@ function ReefPanel(p: { history: ReefYear[]; pressure: Pressure; rank: number | 
 
       <div className="verdict" style={{ ["--v" as string]: VERDICT_COLOR[p.verdict] }}>
         <div className="verdict-title"><span className="dot" />{v.title}</div>
-        <p>{v.line}</p>
+        <p>{verdictLine(p.verdict, p.gain)}</p>
       </div>
       {p.example?.story && <p className="story">{p.example.story} {bleachYears(y, r.i, 0.5) > HOLD_MAX && bleachYears(y, r.i, 0) <= HOLD_MAX ? `Today it holds. With half a degree more warming it would bleach ${bleachYears(y, r.i, 0.5)} years in 10.` : ""}</p>}
 
       <div className="figure">
         <div className="figure-n num"><NumberFlow value={now} /><span className="of"> of 10</span></div>
         <p>years since 2016 hot enough to bleach this reef{p.warm ? ", with 0.5 °C more warming" : ""}. In 1988 to 1997 it was {before} of 10.</p>
+      </div>
+
+      <div className="need">
+        <h2>Heat tolerance needed</h2>
+        <div className="need-n num">{need === null ? `Over ${gainText(p.shift + 1.5)}` : need === 0 ? "None" : gainText(need)}</div>
+        <p className="fine">{need === null ? "No coral we model would hold here. Spend restoration money elsewhere." : need === 0 ? "Today's coral holds here. Protect it and cut local pressure." : `Coral bred to handle water ${need} °C warmer would keep bleaching to 2 years in 10${p.warm ? ", even with 0.5 °C more warming" : ""}. The target for a breeding program.`}</p>
       </div>
 
       <div className="years">
