@@ -8,6 +8,14 @@ Plan: `docs/plans/2026-11-21-reef-base-model.md`. Slides due Sunday 22 November 
 - Labels file fetched and inspected: 41,361 rows, 62 columns, 34,515 with `Percent_Bleaching`. A copy sits in the session scratchpad and must be re-downloaded into `data/gcbd.csv` (URL in the plan).
 - Data links checked by header request on 21 November: CoralTemp daily file 200 (11.7 MB for 2020-01-01, 7.4 MB for 1985-01-01), DHW daily file 200 (2.2 MB), climatology 200 (81.5 MB), PacIOOS ERDDAP 200. Guessed AWS link for the 25 km record returned 404.
 
+## Redesign, 21 Nov 16:00 UTC
+
+The default page is now `web/src/Story.tsx` (light, Lime design system, `lime.css`). The previous explorer is at `#classic` (or any `#tab=` link).
+- One question: "Which reefs are worth restoring?" Map dots coloured by verdict (holds, needs tougher coral, too hot). One switch: add 0.5 °C of future warming.
+- Clicking a reef shows a Smithsonian CC0 coral scan (`public/models/staghorn.glb` for the Tropical Atlantic, `pocillopora.glb` elsewhere; Draco decoder in `public/draco/`). A shader paints the scan a living brown and fades it to bleached white as the model's yearly peak risk rises; upper surfaces pale first. It autoplays 1988 to 2025 on open.
+- A 38-tile year strip uses the same colour mapping; tiles are the scrubber.
+- Examples: Looe Key 16175, Heron Island 442, Moorea 3005, Okinawa 17268.
+
 ## Status, 21 Nov 15:40 UTC
 
 Repo: github.com/hridaya423/reef-margin (private; LeebanY and BeaverLeChip invited with write).
