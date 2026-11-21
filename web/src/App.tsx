@@ -1,9 +1,10 @@
 import NumberFlow from "@number-flow/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getHabitat, getLayer, getReef, postImpact, type Habitat, type ImpactResult, type Layer, type Reef, type ReefDetail } from "./api";
+import { getHabitat, getLayer, getReef, getYears, postImpact, type Habitat, type ImpactResult, type Layer, type Reef, type ReefDetail, type Years } from "./api";
 import { HeatCurve, SstChart } from "./charts";
 import { MapView, type Paint } from "./MapView";
-import { coord, deg, interp, isDonor, pct, placeName, triage, type Triage } from "./model";
+import { annual, bleachYears, coord, decadeCount, deg, gainNeeded, HOLD_MAX, interp, isDonor, pct, placeName, triage, triageYears, type Triage } from "./model";
+import { YearBars } from "./YearBars";
 import { frameColumn, frameRow, getFrames, indexOfDate, monthLabel, previewFrames, shareAbove, type Frames } from "./time";
 import { RiskTimeline } from "./Timeline";
 
@@ -17,6 +18,7 @@ const TABS: { id: Tab; label: string }[] = [
 
 const C = { low: "#3e6272", mid: "#e2a54b", high: "#ee5a4f", sea: "#7fdcc4", dim: "#2a3740", ink: "#e8edf0" };
 const RISK_PAINT: Paint = { kind: "ramp", stops: [[0, "#2f4a58"], [0.3, C.low], [0.5, C.mid], [0.75, "#ea7f45"], [1, C.high]] };
+const YEARS_PAINT: Paint = { kind: "ramp", stops: [[0, "#2f4a58"], [2, C.low], [3, C.mid], [5, "#ea7f45"], [8, C.high]] };
 const TRIAGE_PAINT: Paint = { kind: "class", colors: { holds: C.low, savable: C.sea, beyond: C.high }, fallback: C.dim };
 const DONOR_PAINT: Paint = { kind: "class", colors: { donor: C.sea, match: C.ink }, fallback: C.dim };
 const IMPACT_PAINT: Paint = { kind: "ramp", stops: [[-1, C.dim], [0, C.low], [0.1, C.mid], [0.3, C.high]] };
@@ -66,8 +68,9 @@ export function App() {
   const [playing, setPlaying] = useState(false);
   const [terrain, setTerrain] = useState(false);
   const [habitat, setHabitat] = useState<Load<Habitat> | null>(null);
+  const [years, setYears] = useState<Years | null>(null);
   const [donorWarm, setDonorWarm] = useState(1);
-  const [gapWarm, setGapWarm] = useState(1);
+  const [gapWarm, setGapWarm] = useState(0);
   const [gain, setGain] = useState(0.5);
   const [outfall, setOutfall] = useState<{ lat: number; lon: number } | null>(null);
   const [heat, setHeat] = useState(2);
@@ -158,6 +161,15 @@ export function App() {
     setFocus({ lat: r.lat, lon: r.lon, zoom: 12.2, key: focusKey.current });
   }, [layer, init]);
 
+  useEffect(() => {
+    if (layer.state !== "ready") return;
+    const ctl = new AbortController();
+    getYears(ctl.signal)
+      .then((y) => y.n === layer.data.n && setYears(y))
+      .catch(() => undefined);
+    return () => ctl.abort();
+  }, [layer]);
+
   const closeReef = tab === "risk" && sel !== null && layer.state === "ready" ? layer.data.reefs[sel] : null;
 
   useEffect(() => {
@@ -224,10 +236,11 @@ export function App() {
     const n = reefs.length;
     if (tab === "risk") {
       if (timeView) return { values: frameRow(fr, t), emphasis: new Array(n).fill(0), paint: RISK_PAINT };
+      if (years) return { values: reefs.map((_, k) => bleachYears(years, k, addWarm)), emphasis: new Array(n).fill(0), paint: YEARS_PAINT };
       return { values: reefs.map((r) => interp(r.risk, deltas, addWarm)), emphasis: new Array(n).fill(0), paint: RISK_PAINT };
     }
     if (tab === "gap") {
-      return { values: reefs.map((r) => triage(r, gapWarm, gain)), emphasis: new Array(n).fill(0), paint: TRIAGE_PAINT };
+      return { values: reefs.map((r, k) => (years ? triageYears(years, k, gapWarm, gain) : triage(r, gapWarm, gain))), emphasis: new Array(n).fill(0), paint: TRIAGE_PAINT };
     }
     if (tab === "donors") {
       const matched = new Set(detail?.state === "ready" ? detail.data.donors.map((d) => d.i) : []);
@@ -244,11 +257,12 @@ export function App() {
       emphasis: reefs.map((r) => (delta.has(r.i) ? 1 : -1)),
       paint: IMPACT_PAINT,
     };
-  }, [tab, reefs, deltas, addWarm, gapWarm, gain, detail, impact, timeView, fr, t]);
+  }, [tab, reefs, deltas, addWarm, gapWarm, gain, detail, impact, timeView, fr, t, years]);
 
   const closeup = useMemo(() => {
     if (habitat?.state !== "ready" || !habWeights || tab !== "risk") return null;
     const vals = view.values as number[];
+    const hotAt = timeView || !years ? 0.5 : 5;
     let coral = 0, hot = 0;
     const features = habitat.data.features.map((f, k) => {
       let sw = 0, sv = 0;
@@ -259,12 +273,12 @@ export function App() {
       const v = sw ? sv / sw : 0;
       if (f.properties.c === "Coral/Algae") {
         coral += f.properties.a;
-        if (v >= 0.5) hot += f.properties.a;
+        if (v >= hotAt) hot += f.properties.a;
       }
       return { ...f, properties: { ...f.properties, v } };
     });
-    return { fc: { type: "FeatureCollection", features } as GeoJSON.FeatureCollection, coral, hot };
-  }, [habitat, habWeights, view.values, tab]);
+    return { fc: { type: "FeatureCollection", features } as GeoJSON.FeatureCollection, coral, hot, yearsMode: hotAt === 5 };
+  }, [habitat, habWeights, view.values, tab, timeView, years]);
 
   const lines = useMemo<[number, number][][]>(() => {
     if (tab !== "donors" || sel === null || detail?.state !== "ready") return [];
@@ -352,7 +366,7 @@ export function App() {
           {tab === "impact" && !outfall && layer.state === "ready" && <div className="maphint">Click the map to place a discharge point</div>}
           <button className="chip mapbtn" aria-pressed={terrain} onClick={() => setTerrain((v) => !v)}>3D seafloor</button>
           {timeView && <TimeBar frames={fr} t={t} setT={(k) => { setPlaying(false); setT(k); }} playing={playing} setPlaying={setPlaying} jump={jump} />}
-          {layer.state === "ready" && <Legend tab={tab} closeup={closeup !== null} />}
+          {layer.state === "ready" && <Legend tab={tab} closeup={closeup !== null} years={years !== null && !timeView} />}
         </div>
 
         <aside className="panel" aria-live="polite">
@@ -375,7 +389,8 @@ export function App() {
               pick={pick}
               time={{ on: timeOn, frames, t, share }}
               level={layer.data.level ?? 10}
-              closeup={habitat?.state === "error" ? { error: habitat.message } : habitat?.state === "loading" ? "loading" : closeup ? { coral: closeup.coral, hot: closeup.hot } : null}
+              closeup={habitat?.state === "error" ? { error: habitat.message } : habitat?.state === "loading" ? "loading" : closeup ? { coral: closeup.coral, hot: closeup.hot, yearsMode: closeup.yearsMode } : null}
+              years={years}
               setTimeOn={(on) => {
                 setTimeOn(on);
                 setPlaying(false);
@@ -390,7 +405,7 @@ export function App() {
             <DonorPanel reefs={reefs} sel={sel} detail={detail} warm={donorWarm} setWarm={setDonorWarm} pick={pick} />
           )}
           {layer.state === "ready" && tab === "gap" && (
-            <GapPanel reefs={reefs} sel={sel} warm={gapWarm} setWarm={setGapWarm} gain={gain} setGain={setGain} pick={pick} />
+            <GapPanel years={years} reefs={reefs} sel={sel} warm={gapWarm} setWarm={setGapWarm} gain={gain} setGain={setGain} pick={pick} />
           )}
           {layer.state === "ready" && tab === "impact" && (
             <ImpactPanel reefs={reefs} outfall={outfall} heat={heat} setHeat={setHeat} radius={radius} setRadius={setRadius} impact={impact} place={place} clear={() => setOutfall(null)} />
@@ -401,7 +416,16 @@ export function App() {
   );
 }
 
-function Legend({ tab, closeup }: { tab: Tab; closeup: boolean }) {
+function Legend({ tab, closeup, years }: { tab: Tab; closeup: boolean; years: boolean }) {
+  if (tab === "risk" && years)
+    return (
+      <div className="legend">
+        <div className="title">{closeup ? "Coral coloured by bleaching years" : "Bleaching years, 2016 to 2025"}</div>
+        <div className="ramp" style={{ background: `linear-gradient(90deg, #2f4a58, ${C.low} 20%, ${C.mid} 30%, #ea7f45 50%, ${C.high} 80%)` }} />
+        <div className="ends num"><span>0</span><span>5</span><span>10 of 10</span></div>
+        {closeup && <p className="legend-note">Reef map: Allen Coral Atlas, 10 m. The model scores 5 km cells (dashed square); colour is interpolated between them.</p>}
+      </div>
+    );
   if (tab === "risk")
     return (
       <div className="legend">
@@ -415,9 +439,9 @@ function Legend({ tab, closeup }: { tab: Tab; closeup: boolean }) {
     return (
       <div className="legend">
         <ul>
-          <li><span className="sw" style={{ background: C.low }} />Holds without help</li>
-          <li><span className="sw" style={{ background: C.sea }} />Adaptation can close the gap</li>
-          <li><span className="sw" style={{ background: C.high }} />Gap larger than the gain</li>
+          <li><span className="sw" style={{ background: C.low }} />Holds: 2 or fewer bleaching years a decade</li>
+          <li><span className="sw" style={{ background: C.sea }} />Savable with the tolerance gain</li>
+          <li><span className="sw" style={{ background: C.high }} />Beyond the gain</li>
         </ul>
       </div>
     );
@@ -475,7 +499,7 @@ function DetailError({ message }: { message: string }) {
   return <p className="error">Could not load this reef from the model. {message}.</p>;
 }
 
-type Closeup = null | "loading" | { error: string } | { coral: number; hot: number };
+type Closeup = null | "loading" | { error: string } | { coral: number; hot: number; yearsMode: boolean };
 
 function CloseupSection({ c, when }: { c: Closeup; when: string }) {
   if (c === null) return null;
@@ -486,10 +510,10 @@ function CloseupSection({ c, when }: { c: Closeup; when: string }) {
       {typeof c === "object" && "error" in c && <p className="error">Could not load the reef map. {c.error}.</p>}
       {typeof c === "object" && "coral" in c && (
         <>
-          <p className="note">Coral and algae mapped from satellite within about 7 km, coloured by the model's chance of bleaching {when}.</p>
+          <p className="note">Coral and algae mapped from satellite within about 7 km, coloured by {c.yearsMode ? `the years from 2016 to 2025 the model put this reef past 50% bleaching risk, ${when}` : `the model's chance of bleaching ${when}`}.</p>
           <div className="kpis two">
             <div><div className="label">Coral mapped</div><div className="value num">{c.coral.toFixed(1)} km²</div></div>
-            <div><div className="label"><span className="sw" style={{ background: C.high }} />Past 50% risk</div><div className="value num">{c.hot.toFixed(1)} km²</div></div>
+            <div><div className="label"><span className="sw" style={{ background: C.high }} />{c.yearsMode ? "Bleaching 5+ years in 10" : "Past 50% risk"}</div><div className="value num">{c.hot.toFixed(1)} km²</div></div>
           </div>
         </>
       )}
@@ -512,9 +536,31 @@ function RiskPanel(p: {
   setT: (t: number) => void;
   closeup: Closeup;
   level: number;
+  years: Years | null;
 }) {
+  const y = p.years;
   const f = p.time.on && p.time.frames?.state === "ready" ? p.time.frames.data : null;
   const month = f ? monthLabel(f.dates[p.time.t]) : null;
+  const yCounts = useMemo(() => {
+    if (!y) return null;
+    let beyond = 0, mid = 0, holds = 0;
+    for (let k = 0; k < y.n; k++) {
+      const c = bleachYears(y, k, p.addWarm);
+      if (c >= 5) beyond++;
+      else if (c > HOLD_MAX) mid++;
+      else holds++;
+    }
+    const shareByYear = y.years.map((yr, t) => {
+      let c = 0;
+      for (let k = 0; k < y.n; k++) if (y.ann[t * y.n + k] >= y.scale / 2) c++;
+      return { yr, v: c / y.n };
+    });
+    const med = (from: number) => {
+      const xs = Array.from({ length: y.n }, (_, k) => decadeCount(y, k, from)).sort((a, b) => a - b);
+      return xs[Math.floor(xs.length / 2)];
+    };
+    return { beyond, mid, holds, shareByYear, then: med(1988), now: med(2016) };
+  }, [y, p.addWarm]);
   const counts = useMemo(() => {
     let past = 0, close = 0, room = 0;
     p.reefs.forEach((r, k) => {
@@ -559,6 +605,12 @@ function RiskPanel(p: {
               <div className="big num"><NumberFlow value={Math.round(column[p.time.t] * 100)} suffix="%" /></div>
               <div className="sub">{f.dates[p.time.t] > "2020-12-31" ? "after the last training survey" : "inside the training years"}</div>
             </div>
+          ) : y ? (
+            <div>
+              <div className="label">Bleaching years, 2016 to 2025</div>
+              <div className="big num"><NumberFlow value={bleachYears(y, p.sel, p.addWarm)} suffix=" of 10" /></div>
+              <div className="sub">{(() => { const g = gainNeeded(y, p.sel, p.addWarm); const base = p.addWarm > 0 ? `with ${p.addWarm} °C added; ` : ""; return base + (g === null ? "beyond a +1.5 °C tolerance gain" : g === 0 ? "holds without help" : `needs +${g} °C of tolerance to hold`); })()}</div>
+            </div>
           ) : (
             <div>
               <div className="label">Heat margin</div>
@@ -566,7 +618,19 @@ function RiskPanel(p: {
               <div className="sub">{m.note}</div>
             </div>
           )}
-          {f ? (
+          {!f && y ? (
+            <div>
+              <div className="label">Same reef, 1988 to 1997</div>
+              <div className="mid num">{decadeCount(y, p.sel, 1988)} of 10</div>
+              <div className="sub">the decade before the recent heat</div>
+            </div>
+          ) : f && y ? (
+            <div>
+              <div className="label">Bleaching years, 2016 to 2025</div>
+              <div className="mid num">{bleachYears(y, p.sel, 0)} of 10</div>
+              <div className="sub">{decadeCount(y, p.sel, 1988)} of 10 in 1988 to 1997</div>
+            </div>
+          ) : f ? (
             <div>
               <div className="label">Heat margin today</div>
               <div className="mid num">{m.prefix}{m.v.toFixed(1)} °C</div>
@@ -580,8 +644,15 @@ function RiskPanel(p: {
             </div>
           )}
         </div>
-        <CloseupSection c={p.closeup} when={f ? `at the end of ${month}` : p.addWarm > 0 ? `at its last peak plus ${p.addWarm} °C` : "at its last peak"} />
+        <CloseupSection c={p.closeup} when={f ? `at the end of ${month}` : y ? (p.addWarm > 0 ? `with ${p.addWarm} °C added` : "as the water actually was") : p.addWarm > 0 ? `at its last peak plus ${p.addWarm} °C` : "at its last peak"} />
         {mode}
+        {!f && y && (
+          <div className="section">
+            <h2>Peak bleaching risk, year by year</h2>
+            <p className="note">Bars: the live model's highest monthly risk each year; red past 50%. Dots: diver surveys, filled where {p.level}% or more of corals bleached. Shaded: the decade counted above.</p>
+            <YearBars bars={annual(y, p.sel).map((a) => ({ yr: a.yr, v: a.risk }))} window={y.window} surveys={d?.surveys ?? []} hitAt={p.level} label={`Peak bleaching risk each year for this reef, ${y.years[0]} to ${y.years[y.years.length - 1]}`} />
+          </div>
+        )}
         {f && column && (
           <div className="section">
             <h2>Bleaching risk, month by month</h2>
@@ -622,6 +693,31 @@ function RiskPanel(p: {
           <RiskTimeline series={p.time.share} dates={f.dates} t={p.time.t} onSeek={p.setT} max={Math.max(0.1, Math.ceil(Math.max(...p.time.share) * 10) / 10)} line={null} label="Share of reef cells past 50% bleaching risk, each month since 1988" />
         </div>
         <p className="fine">Select any reef on the map to see its own forty years against what divers recorded.</p>
+      </>
+    );
+  }
+
+  if (y && yCounts) {
+    return (
+      <>
+        <h1>How often does each reef cook?</h1>
+        <p className="lede">Each dot is a 5 km reef cell. Colour counts the years from 2016 to 2025 in which the live model put that reef past 50% risk of at least {p.level}% of its corals bleaching. Fast-growing corals need 10 to 15 years to recover (Hughes et al. 2018).</p>
+        {mode}
+        <div className="control">
+          <label htmlFor="addwarm">Added warming <output className="num">+{p.addWarm.toFixed(2)} °C</output></label>
+          <input id="addwarm" type="range" min={0} max={2} step={0.25} value={p.addWarm} onChange={(e) => p.setAddWarm(Number(e.target.value))} />
+        </div>
+        <div className="kpis">
+          <div><div className="label"><span className="sw" style={{ background: C.high }} />5+ of 10</div><div className="value num"><NumberFlow value={yCounts.beyond} /></div></div>
+          <div><div className="label"><span className="sw" style={{ background: C.mid }} />3 or 4</div><div className="value num"><NumberFlow value={yCounts.mid} /></div></div>
+          <div><div className="label"><span className="sw" style={{ background: C.low }} />2 or fewer</div><div className="value num"><NumberFlow value={yCounts.holds} /></div></div>
+        </div>
+        <div className="section">
+          <h2>The typical reef went from {yCounts.then} to {yCounts.now} bleaching years a decade</h2>
+          <p className="note">Share of the world's reef cells past 50% risk at some point each year. Shaded: 2016 to 2025.</p>
+          <YearBars bars={yCounts.shareByYear} max={Math.max(0.2, Math.ceil(Math.max(...yCounts.shareByYear.map((b) => b.v)) * 5) / 5)} line={null} window={y.window} label="Share of reef cells past 50% bleaching risk each year since 1988" />
+        </div>
+        <p className="fine">Select any reef to fly in and see its coral, mapped from satellite, coloured by the model.</p>
       </>
     );
   }
@@ -814,6 +910,7 @@ function DonorPanel(p: {
 }
 
 function GapPanel(p: {
+  years: Years | null;
   reefs: Reef[];
   sel: number | null;
   warm: number;
@@ -822,49 +919,58 @@ function GapPanel(p: {
   setGain: (v: number) => void;
   pick: (i: number | null, fly?: boolean) => void;
 }) {
+  const y = p.years;
   const counts = useMemo(() => {
     const c: Record<Triage, number> = { holds: 0, savable: 0, beyond: 0 };
-    for (const r of p.reefs) c[triage(r, p.warm, p.gain)]++;
+    if (y) for (let k = 0; k < y.n; k++) c[triageYears(y, k, p.warm, p.gain)]++;
     return c;
-  }, [p.reefs, p.warm, p.gain]);
-  const total = p.reefs.length;
-  const most = useMemo(
-    () => p.reefs.filter((r) => r.labelled && triage(r, p.warm, p.gain) === "savable").sort((a, b) => (a.margin ?? 0) - (b.margin ?? 0)).slice(0, 5),
-    [p.reefs, p.warm, p.gain],
-  );
+  }, [y, p.warm, p.gain]);
+  const most = useMemo(() => {
+    if (!y) return [];
+    return p.reefs
+      .filter((r) => r.labelled && triageYears(y, r.i, p.warm, p.gain) === "savable")
+      .map((r) => ({ r, g: gainNeeded(y, r.i, p.warm) ?? 0 }))
+      .sort((a, b) => b.g - a.g)
+      .filter((x, k, all) => all.findIndex((o) => o.r.eco === x.r.eco) === k)
+      .slice(0, 5);
+  }, [y, p.reefs, p.warm, p.gain]);
+  if (!y) return <PanelSkeleton />;
+  const total = y.n;
   const parts: { k: Triage; label: string; color: string }[] = [
-    { k: "holds", label: "Holds without help", color: C.low },
-    { k: "savable", label: "Adaptation can close the gap", color: C.sea },
-    { k: "beyond", label: "Gap larger than the gain", color: C.high },
+    { k: "holds", label: "Holds: 2 or fewer bleaching years a decade", color: C.low },
+    { k: "savable", label: `Savable with +${p.gain} °C of tolerance`, color: C.sea },
+    { k: "beyond", label: "Beyond the gain", color: C.high },
   ];
   const r = p.sel !== null ? p.reefs[p.sel] : null;
+  const need = r ? gainNeeded(y, r.i, p.warm) : null;
+  const verdict = r ? triageYears(y, r.i, p.warm, p.gain) : null;
   return (
     <>
       {r ? <ReefHead r={r} onClose={() => p.pick(null)} closeLabel="All reefs" /> : <h1>Which reefs can adaptation save?</h1>}
-      {!r && <p className="lede">Compare each reef's heat margin with the warming it will face, then ask how much tolerance breeding or assisted gene flow would need to add.</p>}
+      {!r && <p className="lede">A reef holds if bleaching-level heat hits it 2 or fewer years in 10, giving corals a chance to recover. Add warming, then ask how much heat tolerance breeding or assisted gene flow would need to add.</p>}
       <div className="control">
-        <span className="clabel">Warming scenario</span>
-        <div className="seg" role="group" aria-label="Warming scenario">
-          {[0.5, 1, 1.5, 2].map((w) => (
+        <span className="clabel">Added warming</span>
+        <div className="seg" role="group" aria-label="Added warming">
+          {[0, 0.5, 1, 1.5].map((w) => (
             <button key={w} aria-pressed={p.warm === w} onClick={() => p.setWarm(w)}>+{w} °C</button>
           ))}
         </div>
       </div>
       <div className="control">
-        <label htmlFor="gain">Tolerance gain we can add <output className="num">+{p.gain.toFixed(1)} °C</output></label>
-        <input id="gain" type="range" min={0} max={1.5} step={0.1} value={p.gain} onChange={(e) => p.setGain(Number(e.target.value))} />
+        <label htmlFor="gain">Tolerance gain we can add <output className="num">+{p.gain.toFixed(2)} °C</output></label>
+        <input id="gain" type="range" min={0} max={1.5} step={0.25} value={p.gain} onChange={(e) => p.setGain(Number(e.target.value))} />
       </div>
       {r ? (
         <div className="answer">
           <div>
             <div className="label">Tolerance needed</div>
-            <div className="big num"><NumberFlow value={Math.max(0, p.warm - (r.margin ?? 3))} prefix="+" suffix=" °C" format={{ minimumFractionDigits: 1, maximumFractionDigits: 1 }} /></div>
-            <div className="sub">to stay under 50% risk at +{p.warm} °C</div>
+            <div className="big num">{need === null ? "> +1.5 °C" : <NumberFlow value={need} prefix="+" suffix=" °C" format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }} />}</div>
+            <div className="sub">to hold at +{p.warm} °C</div>
           </div>
           <div>
-            <div className="label">Heat margin today</div>
-            <div className="mid num">{r.margin === null ? "> +3.0 °C" : deg(r.margin)}</div>
-            <div className="sub">{triage(r, p.warm, p.gain) === "holds" ? "holds without help" : triage(r, p.warm, p.gain) === "savable" ? "within reach of the gain" : "beyond the gain"}</div>
+            <div className="label">Bleaching years at +{p.warm} °C</div>
+            <div className="mid num">{bleachYears(y, r.i, p.warm)} of 10</div>
+            <div className="sub">{verdict === "holds" ? "holds without help" : verdict === "savable" ? "within reach of the gain" : "beyond the gain"}</div>
           </div>
         </div>
       ) : (
@@ -888,13 +994,13 @@ function GapPanel(p: {
           <h2>Where the gain matters most</h2>
           <p className="note">Surveyed reefs that need the most tolerance but are still within reach.</p>
           <ul className="rows">
-            {most.map((x) => {
+            {most.map(({ r: x, g }) => {
               const pn = placeName(x);
               return (
                 <li key={x.i}>
                   <button className="row" onClick={() => p.pick(x.i, true)}>
                     <span><div className="name">{pn.title}</div><div className="meta">{pn.sub}</div></span>
-                    <span className="fig">+{(p.warm - (x.margin ?? 0)).toFixed(1)} °C<small>needed</small></span>
+                    <span className="fig">+{g.toFixed(2)} °C<small>needed</small></span>
                   </button>
                 </li>
               );
@@ -902,7 +1008,7 @@ function GapPanel(p: {
           </ul>
         </div>
       )}
-      <p className="fine">Warming is applied evenly to each reef's last three years. Scenario values are inputs, not projections from a named climate model.</p>
+      <p className="fine">Each year from 2016 to 2025, the live model re-scores every reef at its hottest month with heat added or removed over the 120 days before it. Tolerance gain is modelled as the same reef in cooler water. Scenario values are inputs, not projections from a named climate model.</p>
     </>
   );
 }

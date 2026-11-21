@@ -197,6 +197,7 @@ table.surveys td { text-align: right; padding: 7px 0; border-top: 1px solid var(
   .timebar { left: 8px; right: 8px; bottom: 8px; gap: 10px; padding: 8px 10px; }
   .mapwrap[data-time="true"] .legend { display: none; }
   .legend-note { display: none; }
+  .legend { bottom: 44px; }
   .legend { padding: 8px 10px; }
 }
 

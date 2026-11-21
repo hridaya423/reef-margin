@@ -8,6 +8,25 @@ Plan: `docs/plans/2026-11-21-reef-base-model.md`. Slides due Sunday 22 November 
 - Labels file fetched and inspected: 41,361 rows, 62 columns, 34,515 with `Percent_Bleaching`. A copy sits in the session scratchpad and must be re-downloaded into `data/gcbd.csv` (URL in the plan).
 - Data links checked by header request on 21 November: CoralTemp daily file 200 (11.7 MB for 2020-01-01, 7.4 MB for 1985-01-01), DHW daily file 200 (2.2 MB), climatology 200 (81.5 MB), PacIOOS ERDDAP 200. Guessed AWS link for the 25 km record returned 404.
 
+## Status, 21 Nov 15:40 UTC
+
+Repo: github.com/hridaya423/reef-margin (private; LeebanY and BeaverLeChip invited with write).
+
+Headline metric is now **bleaching years**: years in 2016-2025 when the live model put a reef past 50% risk of at least 30% of corals bleaching, at that year's peak month. Heat margin (risk at last 3 years' peak) was 0 for 87% of reefs because the 2023-24 event sits in every window, so it could not triage.
+
+- Serving model target switched from >=10% to >=30% (`SERVE_LEVEL = 30` in reef_app.py). Benchmark for >=30%: 0.935 vs NOAA same-day 0.906, pooled and region-macro CIs above zero.
+- `years_all` / `years_shift`: re-scores each reef's yearly peak month for 2016-2025 under shifts -1.5 to +2 °C. Writes `serve/years.json`, served at `GET /years`.
+- Results: median reef 1 bleaching year in 1988-1997, 4 in 2016-2025. 35% of reefs at 5+, 29% at 2 or fewer. At +1 °C the median is 9. Triage at today's climate with +0.5 °C tolerance: holds 29%, savable 62%, beyond 10%. At +0.5 °C warming no reef holds without help.
+- Reef close-up: clicking a reef flies to zoom 12 in 3D. `GET /habitat?lat&lon` fetches Allen Coral Atlas benthic polygons (public WFS; it blocks the python-requests user agent, so we send `reef-margin/0.1`), cuts them into 250 m tiles, caches in Modal Dict `reef-habitat`. Coral tiles are extruded and coloured by inverse-distance interpolation between nearby 5 km cells; the scored cell is a dashed square.
+- Time view: `GET /frames/meta` + `/frames/data` (466 month-ends x 18,445 cells, uint8). Time bar with play and jumps (Florida Aug 2023, GBR Mar 2024, World Apr 1998). Falls back to labelled "Preview data" if frames fail.
+- Gotcha: after `modal deploy`, old web containers keep serving the old routes. Stop only the web containers (find them with `modal container logs <id>` showing GET lines), never the GPU fine-tunes.
+- Visual check: headless Chromium on Modal (`scratchpad/shoot.py`), never this MacBook's screen.
+
+Open:
+- Transformer pretraining pipeline still fine-tuning; hit the 10-GPU workspace cap (jobs queue). Scratch transformer 0.69-0.72 loses to NOAA; trees ship unless pretrained runs beat them.
+- What-if monotonicity with the 30% model: 72% of cells within 1 point.
+- Iconic Reefs coordinates are approximate.
+
 ## Demo app (web/)
 
 - Vite + React + MapLibre + NumberFlow. Product name "Reef Margin" (working name).
