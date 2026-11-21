@@ -1,7 +1,7 @@
 import NumberFlow from "@number-flow/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getLayer, getYears, type Reef, type Years } from "./api";
-import { CoralView, type Species } from "./CoralView";
+import { getHabitat, getLayer, getYears, type Habitat, type Reef, type Years } from "./api";
+import { ATLANTIC, PACIFIC, ReefScene, type Mix, type Taxon } from "./ReefScene";
 import { bleachYears, decadeCount, triageYears, type Triage } from "./model";
 import { ReefMap, VERDICT_COLOR } from "./ReefMap";
 
@@ -28,7 +28,23 @@ const reefName = (r: Reef) => {
   return { name: r.eco || r.country || "Reef", place: r.country && r.eco ? r.country : `${Math.abs(r.lat).toFixed(2)}° ${r.lat >= 0 ? "N" : "S"}, ${Math.abs(r.lon).toFixed(2)}° ${r.lon >= 0 ? "E" : "W"}` };
 };
 
-const speciesFor = (r: Reef): Species => (r.realm === "Tropical Atlantic" ? "staghorn" : "pocillopora");
+const taxaFor = (r: Reef): Taxon[] => (r.realm === "Tropical Atlantic" ? ATLANTIC : PACIFIC);
+const DEFAULT_MIX: Mix = { coral: 0.3, rock: 0.25, rubble: 0.1, sand: 0.35, seagrass: 0 };
+const MIX_PARTS: { k: keyof Mix; label: string; color: string }[] = [
+  { k: "coral", label: "Coral and algae", color: "#a8703f" },
+  { k: "rock", label: "Rock", color: "#8d8a78" },
+  { k: "rubble", label: "Rubble", color: "#cbbfa6" },
+  { k: "sand", label: "Sand", color: "#e6dcc4" },
+  { k: "seagrass", label: "Seagrass", color: "#5f8a45" },
+];
+
+function mixOf(h: Habitat): Mix | null {
+  const a = h.area_km2;
+  const m = { coral: a["Coral/Algae"] ?? 0, rock: a.Rock ?? 0, rubble: a.Rubble ?? 0, sand: (a.Sand ?? 0) + (a["Microalgal Mats"] ?? 0), seagrass: a.Seagrass ?? 0 };
+  const total = m.coral + m.rock + m.rubble + m.sand + m.seagrass;
+  if (total < 0.05) return null;
+  return { coral: m.coral / total, rock: m.rock / total, rubble: m.rubble / total, sand: m.sand / total, seagrass: m.seagrass / total };
+}
 const bleachOf = (risk: number) => {
   const x = Math.min(1, Math.max(0, (risk - 0.3) / 0.3));
   return x * x * (3 - 2 * x);
@@ -53,6 +69,7 @@ export function Story() {
   const [t, setT] = useState<number | null>(null);
   const [playing, setPlaying] = useState(false);
   const about = useRef<HTMLDialogElement>(null);
+  const [habitat, setHabitat] = useState<{ i: number; mix: Mix | null } | null>(null);
 
   useEffect(() => {
     const ctl = new AbortController();
@@ -66,6 +83,18 @@ export function Story() {
   useEffect(() => {
     window.history.replaceState(null, "", sel === null ? window.location.pathname : `#reef=${sel}`);
   }, [sel]);
+
+  useEffect(() => {
+    if (!data || sel === null) return;
+    const ctl = new AbortController();
+    const r = data.reefs[sel];
+    const timer = window.setTimeout(() => ctl.abort(), 12000);
+    getHabitat(r.lat, r.lon, ctl.signal)
+      .then((h) => setHabitat({ i: sel, mix: mixOf(h) }))
+      .catch(() => setHabitat({ i: sel, mix: null }))
+      .finally(() => window.clearTimeout(timer));
+    return () => ctl.abort();
+  }, [data, sel]);
 
   const shift = warm ? 0.5 : 0;
   const verdicts = useMemo(() => (data ? data.reefs.map((_, k) => triageYears(data.years, k, shift, GAIN)) : []), [data, shift]);
@@ -138,9 +167,13 @@ export function Story() {
           {!data && !failed && <div className="stage-wait">Loading 18,445 reefs</div>}
           {r && (
             <div className="specimen">
-              <CoralView species={speciesFor(r)} bleach={bleachOf(risk)} label={`Coral shown ${risk >= 0.5 ? "bleached" : "healthy"} for ${y!.years[year]}`} />
+              {habitat?.i === r.i ? (
+                <ReefScene seed={r.i} mix={habitat.mix ?? DEFAULT_MIX} taxa={taxaFor(r)} risk={risk} label={`Reconstructed reef patch for ${reefName(r).name} in ${y!.years[year]}, at ${Math.round(risk * 100)}% bleaching risk`} />
+              ) : (
+                <div className="stage-wait light">Mapping this reef from satellite</div>
+              )}
               <div className="specimen-year num" aria-live="polite">{y!.years[year]}</div>
-              <p className="specimen-note">Museum scan of {speciesFor(r) === "staghorn" ? "staghorn coral" : "cauliflower coral"} (Smithsonian, CC0). Colour shows the model's risk for this reef that year.</p>
+              <p className="specimen-note">Reconstruction: habitat mix from the Allen Coral Atlas, corals from Smithsonian scans of {r.realm === "Tropical Atlantic" ? "Caribbean" : "Indo-Pacific"} species. Colour follows the model's risk for this reef.</p>
             </div>
           )}
         </section>
@@ -193,7 +226,7 @@ export function Story() {
           )}
 
           {data && r && y && (
-            <ReefPanel r={r} y={y} verdict={verdicts[r.i]} shift={shift} year={year} setYear={(k) => { setPlaying(false); setT(k); }} playing={playing} play={play} warm={warm} setWarm={setWarm} back={() => choose(null)} />
+            <ReefPanel mix={habitat?.i === r.i ? habitat.mix : undefined} r={r} y={y} verdict={verdicts[r.i]} shift={shift} year={year} setYear={(k) => { setPlaying(false); setT(k); }} playing={playing} play={play} warm={warm} setWarm={setWarm} back={() => choose(null)} />
           )}
         </aside>
       </main>
@@ -210,8 +243,8 @@ export function Story() {
             <dd>A year in which the model put the reef past 50% risk at its hottest month. Fast-growing corals need 10 to 15 years to recover (Hughes et al. 2018), so a reef holds if this happens 2 or fewer years in 10.</dd>
             <dt>Heat-tolerant coral</dt>
             <dd>Selective breeding and assisted gene flow aim to give corals more heat tolerance. We model a gain of 0.5 °C as the same reef in cooler water.</dd>
-            <dt>The coral you see</dt>
-            <dd>A Smithsonian museum scan (CC0), not a photo of this reef. Its colour shows the model's risk for the reef in the chosen year.</dd>
+            <dt>The reef you see</dt>
+            <dd>A reconstruction, not a photo. The mix of coral, rock, rubble, sand and seagrass comes from the Allen Coral Atlas satellite map of this reef. The corals are Smithsonian scans (CC0) of species from the same ocean. Each year the model's risk sets how many colonies bleach, sensitive species first, as in past heatwaves (Loya et al. 2001).</dd>
           </dl>
           <div className="about-foot">
             <a href="#classic" onClick={() => window.location.reload()}>Open the full explorer</a>
@@ -233,7 +266,7 @@ function Warm({ warm, setWarm }: { warm: boolean; setWarm: (v: boolean) => void 
   );
 }
 
-function ReefPanel(p: { r: Reef; y: Years; verdict: Triage; shift: number; year: number; setYear: (k: number) => void; playing: boolean; play: () => void; warm: boolean; setWarm: (v: boolean) => void; back: () => void }) {
+function ReefPanel(p: { mix: Mix | null | undefined; r: Reef; y: Years; verdict: Triage; shift: number; year: number; setYear: (k: number) => void; playing: boolean; play: () => void; warm: boolean; setWarm: (v: boolean) => void; back: () => void }) {
   const { r, y } = p;
   const name = reefName(r);
   const now = bleachYears(y, r.i, p.shift);
@@ -285,6 +318,25 @@ function ReefPanel(p: { r: Reef; y: Years; verdict: Triage; shift: number; year:
       </div>
 
       <Warm warm={p.warm} setWarm={p.setWarm} />
+
+      <div className="onreef">
+        <h2>On this reef</h2>
+        {p.mix === undefined && <div className="skel" style={{ height: 10, marginTop: 12 }} />}
+        {p.mix === null && <p className="fine">No satellite habitat map covers this reef, so the scene uses a typical mix.</p>}
+        {p.mix && (
+          <>
+            <div className="mixbar" role="img" aria-label={MIX_PARTS.map((m) => `${m.label} ${Math.round(p.mix![m.k] * 100)}%`).join(", ")}>
+              {MIX_PARTS.map((m) => p.mix![m.k] > 0.005 && <span key={m.k} style={{ flexGrow: p.mix![m.k], background: m.color }} />)}
+            </div>
+            <ul className="mixlegend">
+              {MIX_PARTS.filter((m) => p.mix![m.k] >= 0.01).map((m) => (
+                <li key={m.k}><span className="dot" style={{ background: m.color }} />{m.label} <span className="num">{Math.round(p.mix![m.k] * 100)}%</span></li>
+              ))}
+            </ul>
+          </>
+        )}
+        <p className="fine">Mapped from satellite within 7 km (Allen Coral Atlas). In the scene, {taxaFor(r)[0].name.toLowerCase()} bleaches first and {taxaFor(r)[taxaFor(r).length - 1].name.toLowerCase()} last, the order seen in past heatwaves (Loya et al. 2001).</p>
+      </div>
     </>
   );
 }

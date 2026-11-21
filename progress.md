@@ -8,6 +8,15 @@ Plan: `docs/plans/2026-11-21-reef-base-model.md`. Slides due Sunday 22 November 
 - Labels file fetched and inspected: 41,361 rows, 62 columns, 34,515 with `Percent_Bleaching`. A copy sits in the session scratchpad and must be re-downloaded into `data/gcbd.csv` (URL in the plan).
 - Data links checked by header request on 21 November: CoralTemp daily file 200 (11.7 MB for 2020-01-01, 7.4 MB for 1985-01-01), DHW daily file 200 (2.2 MB), climatology 200 (81.5 MB), PacIOOS ERDDAP 200. Guessed AWS link for the 25 km record returned 404.
 
+## Reef scene, 21 Nov 16:30 UTC
+
+The reef view is now a reconstructed seafloor patch (`web/src/ReefScene.tsx`), not one specimen:
+- Habitat mix (coral and algae, rock, rubble, sand, seagrass) from `/habitat` area fractions for that reef, so every reef differs.
+- 15 Smithsonian CC0 scans in `web/public/models/reef/` (20k-triangle versions, about 3 MB total): 6 Caribbean, 9 Indo-Pacific. Chosen by realm.
+- Colony count scales with coral fraction; layout seeded by reef index.
+- Each colony bleaches when the model's yearly risk passes 0.22 + 0.62 x its taxon tolerance (Acropora, Pocillopora first; massive Porites, Diploastrea, Turbinaria last; Loya et al. 2001).
+- Underwater fog, caustics, marine snow, swaying seagrass.
+
 ## Redesign, 21 Nov 16:00 UTC
 
 The default page is now `web/src/Story.tsx` (light, Lime design system, `lime.css`). The previous explorer is at `#classic` (or any `#tab=` link).
