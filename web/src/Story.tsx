@@ -38,9 +38,12 @@ const EXAMPLES: Example[] = [
 
 type Pressure = Record<"fishing" | "coastal" | "industry" | "tourism" | "sediment" | "nitrogen" | "pressure" | "connect" | "refuge", number[]>;
 type People = { radius_km: number; pop: number[] };
-type Data = { reefs: Reef[]; years: Years; pressure: Pressure; projects: Project[]; people: People };
+type Impact = { radius_km: number; tourism: number[]; flood: number[] };
+type Loss = { people: number; tourism: number; flood: number };
+type Data = { reefs: Reef[]; years: Years; pressure: Pressure; projects: Project[]; people: People; impact: Impact };
 
 const peopleText = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)} million` : n.toLocaleString("en-GB"));
+const usdText = (n: number) => (n >= 1e9 ? `$${(n / 1e9).toFixed(1)} billion` : n >= 1e6 ? `$${(n / 1e6).toFixed(n >= 1e7 ? 0 : 1)} million` : `$${Math.round(n / 1000).toLocaleString("en-GB")},000`);
 const NO_PROJECTS: Project[] = [];
 
 const PRESSURES: { k: keyof Pressure; label: string }[] = [
@@ -119,8 +122,8 @@ export function Story() {
   useEffect(() => {
     const ctl = new AbortController();
     setFailed(null);
-    Promise.all([getLayer(ctl.signal), getYears(ctl.signal), getStatic<Pressure>("pressure.json", ctl.signal), getStatic<Project[]>("projects.json", ctl.signal), getStatic<People>("people.json", ctl.signal)])
-      .then(([layer, years, pressure, projects, people]) => setData({ reefs: layer.reefs, years, pressure, projects, people }))
+    Promise.all([getLayer(ctl.signal), getYears(ctl.signal), getStatic<Pressure>("pressure.json", ctl.signal), getStatic<Project[]>("projects.json", ctl.signal), getStatic<People>("people.json", ctl.signal), getStatic<Impact>("impact.json", ctl.signal)])
+      .then(([layer, years, pressure, projects, people, impact]) => setData({ reefs: layer.reefs, years, pressure, projects, people, impact }))
       .catch((e: Error) => !ctl.signal.aborted && setFailed(e.message));
     return () => ctl.abort();
   }, [attempt]);
@@ -217,9 +220,9 @@ export function Story() {
     const pr = data.pressure;
     const rows = scoped.map((i, k) => {
       const x = data.reefs[i];
-      return [k + 1, reefName(x).name, x.country, x.lat, x.lon, bleachYears(data.years, i, shift), bleachYears(data.years, i, shift + 0.5), gainNeeded(data.years, i, shift) ?? "", data.people.pop[i], pr.pressure[i], mainPressure(pr, i).label, pr.connect[i]];
+      return [k + 1, reefName(x).name, x.country, x.lat, x.lon, bleachYears(data.years, i, shift), bleachYears(data.years, i, shift + 0.5), gainNeeded(data.years, i, shift) ?? "", data.people.pop[i], data.impact.tourism[i], data.impact.flood[i], pr.pressure[i], mainPressure(pr, i).label, pr.connect[i]];
     });
-    const head = ["rank", "reef", "country", "lat", "lon", "bleaching_years_last_10", "bleaching_years_plus_0_5C", "heat_tolerance_needed_C", "people_within_50km", "local_pressure_percentile", "main_pressure", "larvae_supply_percentile"];
+    const head = ["rank", "reef", "country", "lat", "lon", "bleaching_years_last_10", "bleaching_years_plus_0_5C", "heat_tolerance_needed_C", "people_within_50km", "reef_tourism_usd_per_year_25km", "people_protected_from_flooding_25km", "local_pressure_percentile", "main_pressure", "larvae_supply_percentile"];
     const csv = [head, ...rows].map((r) => r.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(",")).join("\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
@@ -401,7 +404,7 @@ export function Story() {
           )}
 
           {data && r && y && (
-            <ReefPanel history={history!} people={data.people.pop[r.i]} pressure={data.pressure} rank={ranking.rank.get(r.i)} ranked={ranking.order.length} example={example} depth={depth?.i === r.i ? depth.d : undefined} mix={habitat?.i === r.i ? habitat.mix : undefined} r={r} y={y} verdict={verdicts[r.i]} gain={gain} shift={shift} year={year} setYear={(k) => { setPlaying(false); setT(k); }} playing={playing} play={play} warm={warm} setWarm={setWarm} back={() => choose(null)} />
+            <ReefPanel history={history!} loss={{ people: data.people.pop[r.i], tourism: data.impact.tourism[r.i], flood: data.impact.flood[r.i] }} pressure={data.pressure} rank={ranking.rank.get(r.i)} ranked={ranking.order.length} example={example} depth={depth?.i === r.i ? depth.d : undefined} mix={habitat?.i === r.i ? habitat.mix : undefined} r={r} y={y} verdict={verdicts[r.i]} gain={gain} shift={shift} year={year} setYear={(k) => { setPlaying(false); setT(k); }} playing={playing} play={play} warm={warm} setWarm={setWarm} back={() => choose(null)} />
           )}
         </aside>
       </main>
@@ -430,8 +433,8 @@ export function Story() {
             <dd>The world is warming about 0.27 °C a decade (Forster et al. 2025, Indicators of Global Climate Change). At that rate, 0.5 °C more arrives around 2040. Tropical seas warm a little more slowly, so this is an early estimate.</dd>
             <dt>Restoration projects</dt>
             <dd>The 304 projects in Boström-Einarsson et al. (2020, PLoS ONE, data on Dryad). 224 sit within 25 km of a reef we score. The review records why each site was chosen: an existing restoration site, a disturbance, logistics or "favourable conditions". None names heat or bleaching. With 0.5 °C more warming, 66% of these projects would sit on reefs too hot for today's coral.</dd>
-            <dt>People nearby</dt>
-            <dd>People living within 50 km of each reef, from the JRC's GHS-POP 2020 grid at about 1 km (Schiavina et al. 2023, CC BY 4.0). Counted once each, 369 million people live within 50 km of a reef we score.</dd>
+            <dt>What people would lose</dt>
+            <dd>Reef tourism is the visitor spending mapped by Spalding et al. (2017, Marine Policy), summed within 25 km. Flood protection is the coastal residents that reefs shield from storm flooding, from Burke and Spalding (2022, Marine Policy), within 25 km. Both come from The Nature Conservancy's Mapping Ocean Wealth. Neighbours are people within 50 km, from the JRC's GHS-POP 2020 grid (Schiavina et al. 2023, CC BY 4.0). Nearby reefs share these numbers, so they do not add up across reefs. Counted once each, $30.6 billion a year of reef tourism, 3.0 million flood-protected residents and 369 million people sit near the reefs we score.</dd>
             <dt>Will it recover?</dt>
             <dd>Local pressure comes from WCS's global map of six human pressures on reefs (Andrello et al. 2022): fishing, nitrogen and sediment runoff, coastal population, tourism, and ports. Connection to other reefs, which brings in coral larvae, comes from the 50 Reefs analysis (Beyer et al. 2018). Neither changes the bleaching model. They rank where restoration is most likely to last.</dd>
             <dt>Limits and safeguards</dt>
@@ -479,7 +482,7 @@ function Warm({ warm, setWarm }: { warm: boolean; setWarm: (v: boolean) => void 
   );
 }
 
-function ReefPanel(p: { history: ReefYear[]; people: number; pressure: Pressure; rank: number | undefined; ranked: number; example: Example | undefined; depth: Depth | undefined; mix: Mix | null | undefined; r: Reef; y: Years; verdict: Triage; gain: number; shift: number; year: number; setYear: (k: number) => void; playing: boolean; play: () => void; warm: boolean; setWarm: (v: boolean) => void; back: () => void }) {
+function ReefPanel(p: { history: ReefYear[]; loss: Loss; pressure: Pressure; rank: number | undefined; ranked: number; example: Example | undefined; depth: Depth | undefined; mix: Mix | null | undefined; r: Reef; y: Years; verdict: Triage; gain: number; shift: number; year: number; setYear: (k: number) => void; playing: boolean; play: () => void; warm: boolean; setWarm: (v: boolean) => void; back: () => void }) {
   const { r, y } = p;
   const name = reefName(r);
   const now = bleachYears(y, r.i, p.shift);
@@ -494,7 +497,6 @@ function ReefPanel(p: { history: ReefYear[]; people: number; pressure: Pressure;
       </button>
       <h1>{name.name}</h1>
       <p className="place">{name.place}</p>
-      <p className="place">{p.people > 0 ? `${peopleText(p.people)} people live within 50 km` : "No one lives within 50 km"}</p>
 
       <div className="verdict" style={{ ["--v" as string]: VERDICT_COLOR[p.verdict] }}>
         <div className="verdict-title"><span className="dot" />{v.title}</div>
@@ -511,6 +513,15 @@ function ReefPanel(p: { history: ReefYear[]; people: number; pressure: Pressure;
         <h2>Heat tolerance needed</h2>
         <div className="need-n num">{need === null ? `Over ${gainText(p.shift + 1.5)}` : need === 0 ? "None" : gainText(need)}</div>
         <p className="fine">{need === null ? "No coral we model would hold here. Spend restoration money elsewhere." : need === 0 ? "Today's coral holds here. Protect it and cut local pressure." : `Coral bred to handle water ${need} °C warmer would keep bleaching to 2 years in 10${p.warm ? ", even with 0.5 °C more warming" : ""}. The target for a breeding program.`}</p>
+      </div>
+
+      <div className="onreef">
+        <h2>What people would lose</h2>
+        <dl className="facts">
+          <div><dt>Reef tourism</dt><dd>{p.loss.tourism > 0 ? `${usdText(p.loss.tourism)} a year` : "None recorded"}<span className="sub">Spent by reef visitors within 25 km.</span></dd></div>
+          <div><dt>Flood protection</dt><dd>{p.loss.flood > 0 ? `${peopleText(p.loss.flood)} people` : "None recorded"}<span className="sub">Coastal residents within 25 km that reefs shield from storm flooding.</span></dd></div>
+          <div><dt>Neighbours</dt><dd>{p.loss.people > 0 ? `${peopleText(p.loss.people)} people` : "No one"}<span className="sub">Live within 50 km.</span></dd></div>
+        </dl>
       </div>
 
       <div className="years">
