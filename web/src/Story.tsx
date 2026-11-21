@@ -89,7 +89,10 @@ export function Story() {
     const ctl = new AbortController();
     const r = data.reefs[sel];
     const timer = window.setTimeout(() => ctl.abort(), 12000);
-    getHabitat(r.lat, r.lon, ctl.signal)
+    // Demo reefs ship with a saved habitat response so the scene does not depend on venue wifi.
+    fetch(`/cache/habitat/${sel}.json`, { signal: ctl.signal })
+      .then((res) => (res.ok ? (res.json() as Promise<Habitat>) : Promise.reject(new Error("not cached"))))
+      .catch(() => getHabitat(r.lat, r.lon, ctl.signal))
       .then((h) => setHabitat({ i: sel, mix: mixOf(h) }))
       .catch(() => setHabitat({ i: sel, mix: null }))
       .finally(() => window.clearTimeout(timer));
@@ -173,7 +176,7 @@ export function Story() {
                 <div className="stage-wait light">Mapping this reef from satellite</div>
               )}
               <div className="specimen-year num" aria-live="polite">{y!.years[year]}</div>
-              <p className="specimen-note">Reconstruction: habitat mix from the Allen Coral Atlas, corals from Smithsonian scans of {r.realm === "Tropical Atlantic" ? "Caribbean" : "Indo-Pacific"} species. Colour follows the model's risk for this reef.</p>
+              <p className="specimen-note">Illustration, not a forecast of how much bleaches. Generic {r.realm === "Tropical Atlantic" ? "Caribbean" : "Indo-Pacific"} corals on this reef's satellite habitat mix (coral class includes algae). Colonies whiten only in years past 50% risk.</p>
             </div>
           )}
         </section>
@@ -244,7 +247,7 @@ export function Story() {
             <dt>Heat-tolerant coral</dt>
             <dd>Selective breeding and assisted gene flow aim to give corals more heat tolerance. We model a gain of 0.5 °C as the same reef in cooler water.</dd>
             <dt>The reef you see</dt>
-            <dd>A reconstruction, not a photo. The mix of coral, rock, rubble, sand and seagrass comes from the Allen Coral Atlas satellite map of this reef. The corals are Smithsonian scans (CC0) of species from the same ocean. Each year the model's risk sets how many colonies bleach, sensitive species first, as in past heatwaves (Loya et al. 2001).</dd>
+            <dd>A reconstruction, not a photo. The mix of coral, rock, rubble, sand and seagrass comes from the Allen Coral Atlas satellite map of this reef. The corals are Smithsonian scans (CC0) of species from the same ocean. It is an illustration: colonies turn white only in years the model puts the reef past 50% risk, sensitive species first. The model gives the chance of bleaching, not how much of a reef bleaches. The Indo-Pacific order follows Loya et al. (2001); the Caribbean order and all tolerance values are approximate.</dd>
           </dl>
           <div className="about-foot">
             <a href="#classic" onClick={() => window.location.reload()}>Open the full explorer</a>
@@ -335,7 +338,10 @@ function ReefPanel(p: { mix: Mix | null | undefined; r: Reef; y: Years; verdict:
             </ul>
           </>
         )}
-        <p className="fine">Mapped from satellite within 7 km (Allen Coral Atlas). In the scene, {taxaFor(r)[0].name.toLowerCase()} bleaches first and {taxaFor(r)[taxaFor(r).length - 1].name.toLowerCase()} last, the order seen in past heatwaves (Loya et al. 2001).</p>
+        <p className="fine">
+          Mapped from satellite within 7 km (Allen Coral Atlas). The satellite class does not separate coral from algae. In the scene, {taxaFor(r)[0].name.toLowerCase()} bleaches first and {taxaFor(r)[taxaFor(r).length - 1].name.toLowerCase()} last.{" "}
+          {r.realm === "Tropical Atlantic" ? "This order is approximate for Caribbean corals." : "The order follows Indo-Pacific heatwave records (Loya et al. 2001); the tolerance values are our approximation."}
+        </p>
       </div>
     </>
   );

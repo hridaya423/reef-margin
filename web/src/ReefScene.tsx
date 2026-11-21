@@ -257,7 +257,9 @@ export function ReefScene({ seed, mix, taxa, risk, label }: { seed: number; mix:
         const c = box2.getCenter(new THREE.Vector3());
         obj.position.set(p.x - c.x, groundY(p.x, p.z) - box2.min.y - 0.04 * p.d, p.z - c.z);
         scene.add(obj);
-        colonies.push({ obj, bleach, threshold: 0.22 + 0.62 * p.t.tol + p.jitter });
+        // Nothing whitens below 50% risk (the model's "bleaching year" line); above it, sensitive taxa go first.
+        // This is an illustration of the order, not a prediction of how much of the reef bleaches.
+        colonies.push({ obj, bleach, threshold: Math.max(0.52, 0.52 + 0.4 * p.t.tol + p.jitter) });
       });
       el.dataset.ready = "true";
     });
