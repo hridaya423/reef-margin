@@ -20,8 +20,10 @@ const BLEACH_GLSL = `
   }
 `;
 
-export function ScanScene({ url, white, dead, label }: { url: string; white: number; dead: number; label: string }) {
+export function ScanScene({ url, white, dead, label, onReady }: { url: string; white: number; dead: number; label: string; onReady: () => void }) {
   const host = useRef<HTMLDivElement>(null);
+  const ready = useRef(onReady);
+  ready.current = onReady;
   const target = useRef({ white, dead });
   target.current = { white, dead };
 
@@ -42,6 +44,7 @@ export function ScanScene({ url, white, dead, label }: { url: string; white: num
       url,
       onLoad: () => {
         el.dataset.ready = "true";
+        ready.current();
       },
     });
     splats.objectModifier = dyno.dynoBlock({ gsplat: dyno.Gsplat }, { gsplat: dyno.Gsplat }, ({ gsplat }) => {

@@ -113,6 +113,8 @@ export function Story() {
   const [gain, setGain] = useState(0.5);
   const [t, setT] = useState<number | null>(null);
   const [playing, setPlaying] = useState(false);
+  const [autoplay, setAutoplay] = useState(false);
+  const [loaded, setLoaded] = useState<string | null>(null);
   const about = useRef<HTMLDialogElement>(null);
   const [habitat, setHabitat] = useState<{ i: number; mix: Mix | null } | null>(null);
   const [depth, setDepth] = useState<{ i: number; d: Depth } | null>(null);
@@ -255,7 +257,8 @@ export function Story() {
     setSel(i);
     setView("scan");
     setT(i === null || reduce ? null : 0);
-    setPlaying(i !== null && !reduce);
+    setPlaying(false);
+    setAutoplay(i !== null && !reduce);
   }
 
   const started = useRef(false);
@@ -264,7 +267,7 @@ export function Story() {
     started.current = true;
     if (sel !== null && !reduce) {
       setT(0);
-      setPlaying(true);
+      setAutoplay(true);
     }
   }, [data, sel, reduce]);
 
@@ -281,6 +284,14 @@ export function Story() {
   const now = history ? history[year] : null;
   const example = r ? EXAMPLES.find((e) => e.i === r.i) : undefined;
   const scan = r ? scanFor(r) : null;
+  const scanFile = scan?.file;
+
+  useEffect(() => {
+    if (!autoplay || !scanFile || loaded !== scanFile) return;
+    setAutoplay(false);
+    setT(0);
+    setPlaying(true);
+  }, [autoplay, loaded, scanFile]);
 
   return (
     <div className="shell">
@@ -312,7 +323,7 @@ export function Story() {
               {view === "partner" && example?.scan ? (
                 <iframe className="scan" src={example.scan} title="Gaussian splat of a Mars-restored reef in Indonesia" allow="fullscreen; xr-spatial-tracking" />
               ) : view === "scan" ? (
-                <ScanScene url={`${import.meta.env.BASE_URL}${scan!.file}`} white={now!.white} dead={now!.dead} label={`Real reef scan coloured by ${reefName(r).name}'s ${Math.round(risk * 100)}% bleaching risk in ${y!.years[year]}`} />
+                <ScanScene url={`${import.meta.env.BASE_URL}${scan!.file}`} white={now!.white} dead={now!.dead} label={`Real reef scan coloured by ${reefName(r).name}'s ${Math.round(risk * 100)}% bleaching risk in ${y!.years[year]}`} onReady={() => setLoaded(scan!.file)} />
               ) : habitat?.i === r.i ? (
                 <ReefScene seed={r.i} mix={habitat.mix ?? DEFAULT_MIX} taxa={taxaFor(r)} risk={risk} depth={depth?.i === r.i ? depth.d.median ?? null : null} label={`Reconstructed reef patch for ${reefName(r).name} in ${y!.years[year]}, at ${Math.round(risk * 100)}% bleaching risk`} />
               ) : (
@@ -516,12 +527,19 @@ function ReefPanel(p: { history: ReefYear[]; loss: Loss; pressure: Pressure; ran
       </div>
 
       <div className="onreef">
-        <h2>What people would lose</h2>
+        <h2>If this reef dies, people lose</h2>
         <dl className="facts">
-          <div><dt>Reef tourism</dt><dd>{p.loss.tourism > 0 ? `${usdText(p.loss.tourism)} a year` : "None recorded"}<span className="sub">Spent by reef visitors within 25 km.</span></dd></div>
-          <div><dt>Flood protection</dt><dd>{p.loss.flood > 0 ? `${peopleText(p.loss.flood)} people` : "None recorded"}<span className="sub">Coastal residents within 25 km that reefs shield from storm flooding.</span></dd></div>
+          <div><dt>Tourism income</dt><dd>{p.loss.tourism > 0 ? `${usdText(p.loss.tourism)} a year` : "None recorded"}<span className="sub">What reef visitors spend within 25 km.</span></dd></div>
+          <div><dt>Flood protection</dt><dd>{p.loss.flood > 0 ? `${peopleText(p.loss.flood)} people` : "None recorded"}<span className="sub">Coastal residents within 25 km the reef shields from storm floods.</span></dd></div>
           <div><dt>Neighbours</dt><dd>{p.loss.people > 0 ? `${peopleText(p.loss.people)} people` : "No one"}<span className="sub">Live within 50 km.</span></dd></div>
         </dl>
+        <p className="outcome" style={{ ["--v" as string]: VERDICT_COLOR[p.verdict] }}>
+          {p.verdict === "holds"
+            ? "Today's coral survives the heat here. Protect the reef and people keep all of this."
+            : p.verdict === "savable"
+              ? `Today's coral bleaches too often here. Restore it with coral bred ${need ?? p.gain} °C tougher and people keep this.`
+              : `Even coral bred ${p.gain} °C tougher would bleach too often here. Restoring it is unlikely to keep this.`}
+        </p>
       </div>
 
       <div className="years">

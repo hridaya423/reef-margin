@@ -209,3 +209,4 @@ h1, h2 { margin: 0; letter-spacing: -0.01em; }
 .need { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
 .need-n { margin-top: 4px; font-size: 32px; line-height: 38px; font-weight: 600; letter-spacing: -0.02em; }
 .need .fine { margin-top: 4px; font-size: 13px; line-height: 18px; color: var(--fg-2); }
+.outcome { margin: 16px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--surface); box-shadow: inset 3px 0 0 var(--v); font-size: 14px; line-height: 20px; color: var(--fg); }
