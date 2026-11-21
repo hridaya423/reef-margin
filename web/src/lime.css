@@ -53,7 +53,10 @@ h1, h2 { margin: 0; letter-spacing: -0.01em; }
 .specimen-note { position: absolute; right: 16px; bottom: 16px; margin: 0; max-width: 360px; padding: 8px 12px; border-radius: 12px; font-size: 12px; line-height: 16px; color: #fff; background: rgb(15 40 50 / 0.42); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
-.panel { overflow-y: auto; padding: 24px 24px 32px; }
+.panel { overflow-y: auto; overflow-x: hidden; padding: 24px 24px 32px; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; scrollbar-gutter: stable; }
+.panel::-webkit-scrollbar { width: 8px; }
+.panel::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 999px; border: 2px solid var(--page); }
+.panel::-webkit-scrollbar-track { background: transparent; }
 .panel h1 { font-size: 28px; line-height: 34px; font-weight: 600; }
 .panel h2 { font-size: 14px; line-height: 20px; font-weight: 600; }
 .lede { color: var(--fg-2); margin: 12px 0 0; }
@@ -198,7 +201,8 @@ h1, h2 { margin: 0; letter-spacing: -0.01em; }
 .tol { display: flex; flex-direction: column; align-items: stretch; gap: 4px; border: 0; background: none; padding: 4px 2px; border-radius: 10px; cursor: pointer; color: var(--fg-3); font: inherit; transition: background-color 160ms var(--ease); }
 .tol:hover:not(:disabled) { background: var(--surface); }
 .tol:disabled { cursor: default; }
-.tol:focus-visible { outline: 2px solid var(--accent-line); outline-offset: 2px; }
+.tol:focus { outline: none; }
+.tol:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .tol-pct { font-size: 12px; line-height: 16px; text-align: center; }
 .tol-bar { position: relative; height: 56px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
 .tol-bar span { position: absolute; left: 0; right: 0; bottom: 0; background: #1e8e4a; opacity: 0.35; transition: height 480ms var(--ease), opacity 160ms var(--ease); }
@@ -223,3 +227,5 @@ h1, h2 { margin: 0; letter-spacing: -0.01em; }
 .checks td b { color: var(--fg); font-weight: 600; }
 .checks .ok { color: #1e8e4a; font-weight: 700; }
 .checks .miss { color: #d93636; font-weight: 700; }
+.tol-lede { margin: 8px 0 0; font-size: 14px; line-height: 20px; color: var(--fg-2); }
+.tol-lede b { color: var(--fg); font-weight: 600; }

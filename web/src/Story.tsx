@@ -501,19 +501,23 @@ export function Story() {
 }
 
 function Tolerance({ curve, gain, setGain }: { curve: number[]; gain: number; setGain: (g: number) => void }) {
+  const pct = (g: number) => Math.round(curve[GAINS.indexOf(g)] * 100);
   return (
     <div className="tolerance">
-      <h2>How much tougher must coral be?</h2>
-      <p className="fine">Share of these reefs that hold if restored coral handles warmer water. Pick a target.</p>
-      <div className="tol-bars" role="group" aria-label="Heat tolerance of restored coral">
+      <h2>What if we restore with tougher coral?</h2>
+      <p className="tol-lede">
+        With today's coral, <b>{pct(0)}%</b> of these reefs survive the heat. With coral bred to cope with water {gain} °C warmer, <b>{pct(gain)}%</b> do.
+      </p>
+      <div className="tol-bars" role="group" aria-label="How much warmer water restored coral can cope with">
         {GAINS.map((g, k) => (
-          <button key={g} className="tol" aria-pressed={g === gain} disabled={g === 0} onClick={() => setGain(g)} aria-label={`${g === 0 ? "Today's coral" : `Coral ${gainText(g)}`}: ${Math.round(curve[k] * 100)}% of reefs hold`}>
+          <button key={g} className="tol" aria-pressed={g === gain} disabled={g === 0} onClick={() => setGain(g)} aria-label={`${g === 0 ? "Today's coral" : `Coral that copes with water ${g} °C warmer`}: ${Math.round(curve[k] * 100)}% of reefs survive`}>
             <span className="tol-pct num">{Math.round(curve[k] * 100)}%</span>
             <span className="tol-bar"><span style={{ height: `${curve[k] * 100}%` }} /></span>
             <span className="tol-x num">{g === 0 ? "Today" : gainText(g)}</span>
           </button>
         ))}
       </div>
+      <p className="fine">Each bar is the share of reefs that would bleach no more than 2 years in 10. Click a bar to use that coral for the map and the ranking below.</p>
     </div>
   );
 }
