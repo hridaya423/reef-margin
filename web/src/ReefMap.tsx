@@ -15,7 +15,7 @@ export function ReefMap({ reefs, verdicts, selected, compact, onPick }: Props) {
   pick.current = onPick;
 
   useEffect(() => {
-    const m = new maplibregl.Map({ container: el.current!, style: STYLE, center: [150, -5], zoom: 1.6, minZoom: 1, dragRotate: false, attributionControl: { compact: true } });
+    const m = new maplibregl.Map({ container: el.current!, style: STYLE, center: [138, -18], zoom: 2.6, minZoom: 1, dragRotate: false, attributionControl: { compact: true } });
     m.on("load", () => {
       m.addSource("reefs", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
       m.addLayer({

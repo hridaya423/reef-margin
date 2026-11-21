@@ -130,6 +130,31 @@ h1, h2 { margin: 0; letter-spacing: -0.01em; }
 
 .maplibregl-ctrl-attrib { font-size: 10px; }
 
+/* Around this reef: species, telemetry, land and coast */
+.around { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--line); }
+.fine.tight { margin-top: 4px; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; padding: 3px; margin-top: 12px; background: var(--surface); border-radius: 999px; }
+.seg button { border: 0; background: none; padding: 7px 10px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--fg-2); cursor: pointer; white-space: nowrap; transition: background-color 160ms var(--ease), color 160ms var(--ease); }
+.seg button:hover { color: var(--fg); }
+.seg button[aria-selected="true"] { background: var(--page); color: var(--fg); box-shadow: var(--shadow-card); }
+.pane { margin-top: 16px; animation: fade 240ms var(--ease) both; }
+.stat-row { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; }
+.stat-n { font-size: 32px; line-height: 36px; font-weight: 600; letter-spacing: -0.02em; }
+.stat-l { font-size: 13px; line-height: 18px; color: var(--fg-2); }
+.cats { display: flex; flex-direction: column; gap: 4px; }
+.cat { display: inline-flex; align-items: baseline; gap: 6px; font-size: 13px; color: var(--fg-2); white-space: nowrap; }
+.cat .num { color: var(--fg); font-weight: 600; }
+.groups { margin: 12px 0 0; font-size: 13px; color: var(--fg-2); }
+.kpi3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.kpi3 > div { background: var(--surface); border-radius: 16px; padding: 12px 14px; }
+.rows { list-style: none; margin: 8px 0 0; padding: 0; }
+.rows li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; }
+.rows li + li { border-top: 1px solid var(--line); }
+.row-name { display: block; font-size: 14px; font-weight: 500; }
+.row-sub { display: block; font-size: 12px; color: var(--fg-3); }
+.h3 { margin: 20px 0 0; font-size: 13px; font-weight: 600; color: var(--fg); }
+.note-box { margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--surface); font-size: 14px; line-height: 20px; color: var(--fg-2); }
+
 @media (max-width: 960px) {
   .shell { height: auto; min-height: 100dvh; grid-template-rows: 56px auto; }
   .bar { padding: 0 16px; }

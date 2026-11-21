@@ -4,6 +4,7 @@ import { getHabitat, getLayer, getYears, type Habitat, type Reef, type Years } f
 import { ATLANTIC, PACIFIC, ReefScene, type Mix, type Taxon } from "./ReefScene";
 import { bleachYears, decadeCount, triageYears, type Triage } from "./model";
 import { ReefMap, VERDICT_COLOR } from "./ReefMap";
+import { Around } from "./Around";
 
 const GAIN = 0.5;
 
@@ -14,8 +15,11 @@ const VERDICT: Record<Triage, { title: string; line: string; short: string }> = 
 };
 
 const EXAMPLES = [
+  { i: 442, name: "Heron Island", place: "Southern Great Barrier Reef, Australia" },
+  { i: 4313, name: "Lizard Island", place: "Northern Great Barrier Reef, Australia" },
+  { i: 2342, name: "Orpheus Island", place: "Inshore central Great Barrier Reef, Australia" },
+  { i: 812, name: "Ningaloo Reef", place: "Exmouth, Western Australia" },
   { i: 16175, name: "Looe Key", place: "Florida Keys, United States" },
-  { i: 442, name: "Heron Island", place: "Great Barrier Reef, Australia" },
   { i: 3005, name: "Moorea", place: "French Polynesia" },
   { i: 17268, name: "Okinawa", place: "Japan" },
 ];
@@ -343,6 +347,8 @@ function ReefPanel(p: { mix: Mix | null | undefined; r: Reef; y: Years; verdict:
           {r.realm === "Tropical Atlantic" ? "This order is approximate for Caribbean corals." : "The order follows Indo-Pacific heatwave records (Loya et al. 2001); the tolerance values are our approximation."}
         </p>
       </div>
+
+      <Around i={r.i} lat={r.lat} lon={r.lon} />
     </>
   );
 }
